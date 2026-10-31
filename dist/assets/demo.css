@@ -86,3 +86,18 @@ footer { background: #fffdf8; border-top: 2px solid #e2e5d5; }
 @media (prefers-reduced-motion: reduce) {
   button { transition: none; }
 }
+
+/* Optional sound control: normal gameplay remains usable when audio is muted. */
+#music-toggle { flex: 0 0 64px; position: relative; font-size: 28px; }
+#music-toggle[aria-pressed="false"] { color: #879188; }
+#music-toggle[aria-pressed="false"]::after {
+  content: "";
+  position: absolute;
+  width: 31px;
+  height: 3px;
+  background: #bf263c;
+  border-radius: 3px;
+  left: 16px;
+  top: 30px;
+  transform: rotate(-45deg);
+}
