@@ -1,0 +1,87 @@
+/* Presentation layer for the archived build; the game keeps its touch geometry. */
+:root {
+  --kvv-red: #bf263c;
+  --ink: #263d34;
+  --paper: #faf8f0;
+  background: #243c33;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 15% 20%, #66815c40, transparent 50%),
+    repeating-linear-gradient(135deg, transparent 0 46px, #ffffff03 46px 48px),
+    #243c33;
+}
+
+#kiosk { box-shadow: 0 24px 100px #101f1b60; }
+header { padding-left: 30px; gap: 26px; background: #fffdf8; }
+.brand { flex-direction: row; align-items: center; gap: 16px; }
+.brand-tile {
+  display: grid;
+  place-items: center;
+  width: 136px;
+  height: 78px;
+  background: var(--kvv-red);
+}
+.brand-tile img { display: block; width: 112px; height: auto; }
+.brand-copy { width: 105px; font-size: 12px; line-height: 1.6; color: #657163; }
+.game-name { font-size: 21px; letter-spacing: 2.5px; }
+.game-name .edition { font-size: 9px; letter-spacing: 1.8px; margin: 0 0 7px; color: #8a7863; }
+.game-name > span:last-child { margin-top: 5px; }
+.icon-button { background: #f5f4e9; border-radius: 50%; }
+.screen { z-index: 2; background: radial-gradient(ellipse at 35% 65%, #f4efd9, transparent 65%), var(--paper); }
+.intro { top: 43px; }
+.eyebrow { color: #5d7058; font-size: 11px; letter-spacing: 1.8px; }
+.eyebrow i { box-shadow: 0 0 0 4px #bf263c0d; }
+h1 { margin-top: 24px; font-size: 51px; line-height: 1.1; }
+h1 em { color: var(--kvv-red); font-style: normal; position: relative; }
+h1 em::after {
+  content: "";
+  position: absolute;
+  height: 6px;
+  border-radius: 50%;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  background: #e9bc49;
+  transform: rotate(-3deg);
+}
+.intro p { font-size: 17px; margin-bottom: 25px; }
+.primary { border-radius: 10px; box-shadow: 0 5px #961d2f, 0 10px 22px #bf263c15; transition: background .15s; }
+.primary:hover { background: #a91f34; }
+.secondary:hover { background: #e3e7d7; }
+.intro-meta { gap: 12px; margin-top: 22px; color: #586a53; }
+.intro-meta > span { padding: 7px 11px; border: 1px solid #dfe2d0; border-radius: 20px; background: #fffdf780; }
+.hero { top: 22px; right: 26px; width: 445px; height: 440px; border-radius: 95px 16px 95px 16px; box-shadow: 10px 12px 0 #e5e9d6; }
+.hero-sticker { bottom: 22px; right: 17px; font-size: 18px; box-shadow: 0 3px 12px #4f573c20; }
+.route-strip {
+  left: 46px;
+  right: 46px;
+  bottom: 12px;
+  height: 42px;
+  width: 570px;
+  gap: 10px;
+  letter-spacing: 1.3px;
+  color: #53634e;
+  font-weight: 700;
+}
+.route-strip .stop-dot { display: grid; place-items: center; width: 25px; height: 25px; border: 2px solid #286b9b; border-radius: 50%; color: #286b9b; font-size: 11px; background: var(--paper); }
+.route-strip .stop-dot:nth-of-type(2) { border-color: #8d387e; color: #8d387e; }
+.route-strip .stop-dot:nth-of-type(3) { border-color: #966012; color: #966012; }
+.route-strip b { height: 2px; width: 27px; background: #c3cdb5; }
+.ticket-stamp { position: absolute; right: 32px; bottom: 9px; transform: rotate(-5deg); border: 1px dashed #a5ae91; border-radius: 8px; padding: 7px 16px; color: #728368; font-size: 9px; letter-spacing: 1.5px; text-align: center; }
+.ticket-stamp strong { font-size: 15px; line-height: 1.4; }
+.ticket-stamp span { display: block; font-size: 5px; letter-spacing: .7px; }
+.track-garden { position: absolute; inset: 0; width: 1024px; height: 540px; pointer-events: none; z-index: 1; }
+footer { background: #fffdf8; border-top: 2px solid #e2e5d5; }
+.mascot { width: 76px; height: 76px; border-radius: 50%; border: 2px solid #e8c36e; }
+.best { padding: 10px 0 10px 24px; }
+.best strong { color: var(--kvv-red); }
+.stat strong { font-variant-numeric: tabular-nums; }
+.stat:first-child strong { color: var(--kvv-red); }
+.footer-bottom { color: #747d6b; font-size: 8px; letter-spacing: 1.3px; }
+.overlay { z-index: 10; backdrop-filter: blur(4px); }
+.dialog { border-top: 6px solid #efc65c; }
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
+}

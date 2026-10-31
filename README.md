@@ -1,122 +1,98 @@
 # KVV · Weichenheld
 
-Spielbarer Touchscreen-Prototyp auf Basis von [mojzis/traingame](https://github.com/mojzis/traingame).
-Ziel: ein älterer Fahrkartenautomat mit 15-Zoll-Touchscreen, vorläufig **1024 × 768 Pixel**.
-Lokaler Browserbetrieb auf Windows und Raspberry Pi OS; keine externen Dienste,
-Schriften, Konten oder Internetverbindung im Spielbetrieb.
+Ein kleines Stellwerk für Karlsruhe: Weichen antippen, Bahnen ans richtige Ziel
+bringen und in 90 Sekunden möglichst viele Punkte sammeln.
 
-## Spielen
+**[Webdemo spielen](https://kooglershub.github.io/KVV-Game/)** ·
+[Repository](https://github.com/kooglersHub/KVV-Game)
 
-Jede Bahn zeigt ihr Ziel: **D = Durlach, M = Marktplatz, H = Hauptbahnhof**.
-Weichen antippen und die Bahn zum passenden Gleis leiten. Jede richtige Ankunft
-bringt 10 Punkte, ab der vierten richtigen Ankunft in Folge 20, ab der siebten 30.
-Ein falsches Ziel setzt die Serie zurück; drei Fehlleitungen oder ein Zusammenstoß
-beenden die Runde. Eine Bahn lässt sich durch Antippen einmal für zwei Sekunden
-bremsen; sie fährt automatisch weiter. Achtung: Die nachfolgende Bahn fährt weiter!
+## Vorführen
 
-Die ersten 20 Sekunden sind ruhig, ab Sekunde 20 beginnt der Stadtverkehr und ab
-Sekunde 50 der Feierabendverkehr. Nach 90 Sekunden kommen keine neuen Bahnen mehr;
-die letzten Bahnen dürfen ihre Ankunft noch abschließen.
-Die Linienbezeichnungen und der Gleisplan sind spielerisch und kein realer Fahrplan.
+Den Demolink im Browser öffnen und „Los geht’s“ wählen. „So geht’s“ erklärt die
+Regeln. Der Button oben rechts schaltet auf Vollbild. Maus und Touch funktionieren;
+für die Präsentation eignet sich ein Querformatdisplay. Die Oberfläche skaliert
+proportional von 1024 × 768 Pixeln. Auf kleinen Hochformatdisplays wird sie entsprechend
+klein. Es werden keine Konten, externen Schriften oder Spieldienste benötigt.
 
-- 72 × 72 Pixel große Weichen-Touchflächen; Hauptbuttons mindestens 64 Pixel hoch.
-- Anleitung, Pause, Fortsetzen, Ergebnis und Neustart vollständig per Touch.
-- Lokaler Rekord; bei gesperrtem Browserspeicher bleibt das Spiel nutzbar.
-- Nach 60 Sekunden ohne Eingabe zurück zum Start. Pause bei verborgenem Browserfenster.
-- Tastatur: Tab/Enter für Menüs, Leertaste/Escape zum Pausieren.
+Dies ist ein **inoffizieller Spielprototyp**, kein Angebot des KVV.
 
 ## Lokal starten
 
-Voraussetzungen für Entwicklung: Node.js 22+, pnpm 11 und ein Browser mit Canvas 2D.
+Node.js 22 oder neuer installieren, dann im Projektordner:
 
 ```sh
-pnpm install --frozen-lockfile
-pnpm dev
+node scripts/serve.mjs
 ```
 
-Browser: **http://localhost:3000**.
+**http://localhost:3000** im Browser öffnen. Unter Windows geht auch ein Doppelklick
+auf `Start-Windows.cmd`. Strg+C beendet den Server. Mit der Umgebungsvariable `PORT`
+lässt sich ein anderer Port wählen. Der Server bindet nur an `127.0.0.1`.
 
-Fertige Version bauen und lokal ausliefern:
+Es ist **keine Installation von Abhängigkeiten und kein Build** erforderlich.
+Mit allen Dateien lokal ist der Spielbetrieb ohne Internet möglich. Die Webdemo
+wird nicht durch einen Service Worker für Offlinebesuche zwischengespeichert.
+
+## Spielen
+
+- Jede Bahn zeigt ihr Ziel: **D = Durlach, M = Marktplatz, H = Hauptbahnhof**.
+- Weichen anklicken oder antippen, um die Bahn zum passenden Gleis zu führen.
+- Eine Bahn lässt sich einmal für zwei Sekunden bremsen. Nachfolgende Bahnen fahren weiter.
+- Richtige Ankünfte bringen 10 Punkte, ab vier richtigen Ankünften in Folge 20,
+  ab sieben 30. Eine Fehlleitung setzt die Serie zurück.
+- Drei Fehlleitungen oder ein Zusammenstoß beenden die Runde.
+- Nach 90 Sekunden kommen keine neuen Bahnen; die letzten dürfen noch ankommen.
+- Leertaste oder Escape pausieren. Menüs funktionieren mit Tab und Enter.
+- Der Rekord wird lokal im Browser gespeichert. Nach 60 Sekunden ohne Eingabe
+  kehrt das Spiel zum Start zurück. Ein verborgenes Browserfenster pausiert die Runde.
+
+Linien und Gleisplan sind spielerisch, kein realer Fahrplan.
+
+## Tests und Veröffentlichung
 
 ```sh
-pnpm build
-pnpm start
+node --test tests/website.test.mjs
 ```
 
-Unter Windows startet alternativ `Start-Windows.cmd` den Server. Anschließend
-http://localhost:3000 öffnen. Fenster offen lassen, Strg+C beendet den Server.
-Der Server bindet ausschließlich an 127.0.0.1. Ein anderer Port ist über PORT möglich.
+Die Tests starten einen eigenen Server auf Port 49337. Sie prüfen ausgelieferte
+Dateien, relative Assetpfade für GitHub Pages, erlaubtes Browser-Zoom sowie
+404-Antworten und den Schutz vor Zugriffen außerhalb von `dist/`.
+
+GitHub Actions führt die Tests bei Pushes und Pull Requests aus. Nach einem
+erfolgreichen Push auf `main` veröffentlicht der Workflow den Inhalt von `dist/`
+automatisch über GitHub Pages. Die Repository-Einstellung **Settings → Pages →
+Source: GitHub Actions** ist dafür aktiviert.
+
+Die Tests ersetzen keine Prüfung der Spielmechanik im Browser. Eine ursprüngliche
+Unit-Testsuite und die TypeScript-Quellen sind im übergebenen ZIP nicht enthalten.
+
+## Projektstruktur und Bearbeitung
+
+- `dist/index.html`: bearbeitbare Oberfläche und Menüs.
+- `dist/assets/demo.css`: neue Gestaltungsschicht mit KVV-Logo,
+  Haltestellenleiste, Ticketstempel und Spielfeldbegrünung.
+- `dist/assets/kvv-logo.svg`: unverändertes Logo von der offiziellen KVV-Website;
+  das weiße Zeichen steht auf einer roten Fläche.
+- `dist/assets/index-*.js`, `dist/assets/index-*.css`: vorkompilierter Originalstand
+  aus `KVV-Weichenheld.zip`. Der Phaser-Spielcode wurde unverändert übernommen.
+- `dist/assets/*.webp`: bereitgestellte Spielillustrationen.
+- `scripts/serve.mjs`: lokaler statischer Server ohne Abhängigkeiten.
+- `.github/workflows/pages.yml`: Tests und Veröffentlichung.
+- `tests/website.test.mjs`: HTTP- und Auslieferungstests mit Node.js.
+- `THIRD_PARTY.md`: Herkunft und Lizenzhinweise.
+
+Für größere Änderungen der Spiellogik werden die ursprünglichen TypeScript-Quellen
+benötigt. Ein `pnpm dev` oder `pnpm build` ist mit diesem Archiv nicht möglich.
 
 ## Raspberry Pi / Automat
 
-Der Build entsteht auf dem Entwicklungsrechner. Nur `dist/`, `scripts/serve.mjs`
-und `Start-Pi.sh` auf den Pi kopieren. Dort sind Node.js und Chromium erforderlich;
-keine Entwicklungsabhängigkeiten und kein Build auf dem Gerät nötig.
+`dist/`, `scripts/serve.mjs` und `Start-Pi.sh` auf den Pi kopieren. Node.js und
+Chromium müssen installiert sein. Mit `sh Start-Pi.sh` startet der lokale Server
+zusammen mit Chromium im Kioskmodus. Bildschirmrotation, Touchkalibrierung und
+Autostart müssen passend zum Gerät eingerichtet werden.
 
-```sh
-sh Start-Pi.sh
-```
+Die Spielbasis verwendet Canvas, eine feste interne Auflösung und eine Zielbildrate
+von 30 FPS. **Es liegt kein Raspberry-Pi-Hardwaretest vor.** Vor Automatenbetrieb
+Touchflächen, mehrere vollständige Runden, Inaktivitätsrückkehr, Offline-Kaltstart
+und Wiederanlauf nach Stromverlust am tatsächlichen Gerät prüfen.
 
-Das Skript startet den lokalen Server und Chromium im Kioskmodus. Für die endgültige
-Installation Bildschirmrotation, 1024 × 768, Touch-Kalibrierung, Bildschirmschoner
-und den Autostart passend zum konkreten Raspberry Pi OS konfigurieren.
-
-### Leistungsbudget und Abnahme
-
-Canvas-Renderer, 30 FPS Zielbildrate, feste interne Auflösung, keine hochauflösende
-Retina-Zeichenfläche, maximal zwölf gleichzeitige Bahnen und wiederverwendete
-Zugtextur. Vier lokale WebP-Bildableitungen ersetzen die großen PNGs im Spiel.
-Die Szenen verwenden drei Gleise und sechs feste Weichen; der zufällige
-Layoutgenerator der Vorlage wurde durch einen für Touch geprüften Plan ersetzt.
-
-**Noch kein Raspberry-Pi-3-Hardwaretest.** Die Bildrate ist ein Ziel, keine gemessene
-Garantie. Vor dem Automatenbetrieb prüfen:
-
-1. Zehn Minuten spielen: stabile Frametimes nahe 33 ms, keine thermische Drosselung.
-2. Reale Touch-Eingaben an allen sechs Weichen, keine Fehlzuordnung am Rand.
-3. Mehrere vollständige Runden, Kollision, Pause, Neustart und Inaktivitätsrückkehr.
-4. Kaltstart ohne Netz, Vollbild, Wiederanlauf nach Stromverlust.
-
-Die Oberfläche skaliert proportional und behält ihr 4:3-Format. Kleinere Displays
-verkleinern auch die Touchflächen; der Automat ist deshalb bei 1024 × 768 abzunehmen.
-
-## Qualität prüfen
-
-```sh
-pnpm lint
-pnpm test:run
-pnpm build
-```
-
-Browserprüfung bei laufendem Produktionsserver:
-
-```sh
-pnpm add -D playwright
-pnpm exec playwright install chromium
-node scripts/smoke-test.mjs
-```
-
-Alternativ PLAYWRIGHT_MODULE auf einen bereits installierten Playwright-Paketpfad
-setzen. Screenshots entstehen in `test-results/`. GitHub Actions führt Lint,
-Unit-Tests und Build aus. Die übernommenen Test-Doubles enthalten noch explizite
-`any`-Typen, die der Linter als Warnung meldet. Produktivcode ist streng typisiert.
-
-## Projektstruktur
-
-- `src/entities/`: Bahnen und Touch-Weichen der angepassten TrainGame-Basis.
-- `src/systems/`: Zugverwaltung, Kollision, Gleise und Speicherung.
-- `src/config/kiosk.config.ts`: Rundenlänge, Inaktivität, Haltestellen und Gleisplan.
-- `src/scenes/MainScene.ts`: Spielrunde und Szenenlebenszyklus.
-- `src/main.ts`, `src/style.css`: Touch-Oberfläche und Browserintegration.
-- `public/assets/`: verkleinerte Ableitungen der bereitgestellten KVV-Grafiken.
-- `scripts/prepare-assets.py`: reproduzierbare Bildverkleinerung mit Pillow.
-- `THIRD_PARTY.md`: Herkunft und Lizenzstatus der Basis und Bilder.
-
-## Spätere App
-
-Die Browseranwendung trennt Spiellogik und Oberfläche von der Plattform. Ein
-Web-App-Manifest ist vorhanden. Native Windows-/Android-Pakete, Store-Veröffentlichung
-und Service-Worker-Caching sind noch nicht umgesetzt. Für den Automaten funktioniert
-Offlinebetrieb bereits über den lokalen Server mit allen Dateien auf dem Gerät.
-
-Stand: 31. Oktober 2026. Basis-Commit: `0b8673fd94f2c11e01374c2b19c07e7f70527c06`.
+Stand: 1. November 2026.
