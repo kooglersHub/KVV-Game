@@ -34,10 +34,16 @@ wird nicht durch einen Service Worker für Offlinebesuche zwischengespeichert.
 
 ## Spielen
 
-- Jede Bahn zeigt ihr Ziel: **D = Durlach, M = Marktplatz, H = Hauptbahnhof**.
+- Vier Gleise mit zwölf Weichen und vier Zielen: **D = Durlach, M = Marktplatz,
+  H = Hauptbahnhof, E = Europaplatz**. Jedes Ziel ist von jedem Einfahrgleis erreichbar.
 - Weichen anklicken oder antippen, um die Bahn zum passenden Gleis zu führen.
-- Alle Bahnen fahren mit derselben Grundgeschwindigkeit. Die Verkehrsphasen
-  erhöhen das Tempo gemeinsam; zufällig schnellere Nachzügler gibt es nicht.
+- Die Grundgeschwindigkeiten variieren zwischen 80, 100, 120 und 140. Für einen
+  Zielbahnhof sind höchstens zwei Bahnen gleichzeitig auf der Karte; eine neue
+  Bahn darf höchstens so schnell sein wie die langsamste noch sichtbare Bahn mit
+  demselben Ziel. Angekommene Bahnen zählen bis zum Verlassen der Karte mit.
+- Auf dem Einfahrgleis wird ebenfalls das Tempo vorausfahrender Bahnen beachtet.
+  Ein Abstandspuffer berücksichtigt eine zweisekündige Bremse bei maximalem
+  Phasentempo. Sind Ziele voll oder Einfahrten blockiert, entfällt dieser Spawn.
 - Eine Bahn lässt sich einmal für zwei Sekunden bremsen. Nachfolgende Bahnen fahren weiter.
 - Richtige Ankünfte bringen 10 Punkte, ab vier richtigen Ankünften in Folge 20,
   ab sieben 30. Eine Fehlleitung setzt die Serie zurück.
@@ -58,9 +64,11 @@ node --test tests/*.test.mjs
 Die Tests starten einen eigenen Server auf Port 49337. Sie prüfen ausgelieferte
 Dateien, relative Assetpfade für GitHub Pages, erlaubtes Browser-Zoom sowie
 404-Antworten und den Schutz vor Zugriffen außerhalb von `dist/`.
-Zusätzliche Regressionstests prüfen die tatsächlich ausgelieferte Spawnlogik:
-keine schnelleren Nachzügler, gleiches Tempo vor Gleiswechseln und weiterhin
-gesperrter Spawn bei zu geringem Abstand. Das Website-Symbol verwendet dieselbe
+Zusätzliche Tests prüfen die ausgelieferte Spawnlogik, Zielkontingente,
+Geschwindigkeitsgrenzen, Abstandspuffer, Timer und die Reservierung eines Ziels
+vor der Darstellung der Bahn. Der Gleisplan wird auf Erreichbarkeit aller Ziele
+und überlappungsfreie Touchflächen geprüft. Ein HTTP-Test lädt außerdem den
+vollständigen Modulgraphen. Das Website-Symbol verwendet dieselbe
 Originalgeometrie wie das KVV-Logo im Seitenkopf.
 
 GitHub Actions führt die Tests bei Pushes und Pull Requests aus. Nach einem
@@ -78,21 +86,24 @@ Unit-Testsuite und die TypeScript-Quellen sind im übergebenen ZIP nicht enthalt
   Haltestellenleiste, Ticketstempel und Spielfeldbegrünung.
 - `dist/assets/kvv-logo.svg`: unverändertes Logo von der offiziellen KVV-Website;
   das weiße Zeichen steht auf einer roten Fläche.
-- `dist/assets/index-*.js`, `dist/assets/index-*.css`: vorkompilierter Originalstand
-  aus `KVV-Weichenheld.zip`. In `index-fair-traffic-v1.js` wurde ausschließlich
-  `trainSpeedVariants` von `[80,100,120,140]` auf `[100]` gesetzt, damit alle Bahnen
-  mit derselben Grundgeschwindigkeit fahren. Die drei gemeinsamen Tempophasen
-  und die Abstandskontrolle bleiben erhalten. Bei einer Änderung des Bundles
-  einen neuen Dateinamen verwenden und den Moduleintrag in `index.html` anpassen,
-  damit Browser keine veraltete Spielversion aus ihrem Cache laden.
+- `dist/game/network.js`: vier Gleise, vier Ziele, zwölf Weichen und Spielkonstanten.
+- `dist/game/dispatch-policy.js`: reine, separat testbare Spawnentscheidung.
+- `dist/game/train-manager.js`: Phaser-Anbindung, Zielreservierung und Spawntimer.
+- `dist/assets/index-four-track-v2.js`: Spielbasis aus `KVV-Weichenheld.zip`,
+  angepasst an diese Module. Der bisherige TrainManager wurde durch das lesbare
+  Modul ersetzt; Darstellung und Zielschilder nutzen den gemeinsamen Gleisplan.
+  Bei Änderungen an Browsermodulen auf Cache-Versionierung achten.
+- `dist/assets/index-*.css`: ursprüngliche Oberflächengestaltung.
 - `dist/assets/*.webp`: bereitgestellte Spielillustrationen.
 - `scripts/serve.mjs`: lokaler statischer Server ohne Abhängigkeiten.
 - `.github/workflows/pages.yml`: Tests und Veröffentlichung.
-- `tests/website.test.mjs`: HTTP- und Auslieferungstests mit Node.js.
+- `tests/*.test.mjs`: Spawn-, Gleisplan-, Integrations- und HTTP-Tests mit Node.js.
 - `THIRD_PARTY.md`: Herkunft und Lizenzhinweise.
 
-Für größere Änderungen der Spiellogik werden die ursprünglichen TypeScript-Quellen
-benötigt. Ein `pnpm dev` oder `pnpm build` ist mit diesem Archiv nicht möglich.
+Spawnregeln und Gleisplan können direkt in den lesbaren Modulen unter `dist/game/`
+bearbeitet werden. Die übrige Szene liegt weiterhin vorkompiliert vor; für deren
+umfassende Weiterentwicklung wären die ursprünglichen TypeScript-Quellen hilfreich.
+Ein `pnpm dev` oder `pnpm build` ist mit diesem Archiv nicht möglich.
 
 ## Raspberry Pi / Automat
 

@@ -11,7 +11,7 @@
     <title>KVV · Weichenheld</title>
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=kvv-2" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <script type="module" crossorigin src="./assets/index-fair-traffic-v1.js"></script>
+    <script type="module" crossorigin src="./assets/index-four-track-v2.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-BGAIqbdn.css">
     <link rel="stylesheet" href="./assets/demo.css">
   </head>
@@ -38,6 +38,7 @@
       <section id="play-area" aria-label="Spielfeld">
         <div id="game-container"></div>
         <svg class="track-garden" viewBox="0 0 1024 540" aria-hidden="true" focusable="false">
+          <g transform="translate(0 190) scale(.62)">
           <defs>
             <g id="tree"><ellipse cy="7" rx="21" ry="6" fill="#788b67" opacity=".12"/><path d="M0 3v-29" stroke="#8f8266" stroke-width="4"/><circle cy="-32" r="17" fill="#b1c698"/><circle cx="-10" cy="-24" r="12" fill="#c5d4aa"/><path d="M0-9v-20m0 9 7-6" fill="none" stroke="#8da575" stroke-width="2"/></g>
             <g id="flower"><path d="M0 3V-5m0 6-4-3" stroke="#839d72" stroke-width="2"/><circle cy="-7" r="4" fill="#efc65c"/><circle cy="-7" r="1.5" fill="#bf263c"/></g>
@@ -48,6 +49,7 @@
           <use href="#flower" x="131" y="480"/><use href="#flower" x="145" y="487"/><use href="#flower" x="226" y="480"/>
           <g transform="translate(168 463)" stroke="#a19a78" stroke-width="3" stroke-linecap="round"><path d="M0 6h30M0 0h30M4 8v7M26 8v7"/></g>
           <text x="24" y="522" fill="#7a8b70" font-family="Arial, sans-serif" font-size="10" letter-spacing="2">EIN BISSCHEN KARLSRUHE. VIEL FREIE FAHRT.</text>
+          </g>
         </svg>
         <div id="menu" class="screen">
           <div class="intro">
@@ -75,7 +77,8 @@
           <div class="route-strip">
             <span class="stop-dot">D</span> DURLACH <b></b>
             <span class="stop-dot">M</span> MARKTPLATZ <b></b>
-            <span class="stop-dot">H</span> HAUPTBAHNHOF
+            <span class="stop-dot">H</span> HAUPTBAHNHOF <b></b>
+            <span class="stop-dot">E</span> EUROPAPLATZ
           </div>
           <div class="ticket-stamp" aria-hidden="true">90 SEKUNDEN<br /><strong>1 MISSION</strong><span>ENTWERTET? ERST NACH DEM SPIEL.</span></div>
         </div>
@@ -121,7 +124,7 @@
           </div>
           <div class="game-tip">
             <b id="dispatch-status">Einfahren · Serie 0 · Fehler 0/3</b>
-            <span>Ziel D / M / H beachten · Bahn antippen = Bremse</span>
+            <span>Ziel D / M / H / E beachten · Bahn antippen = Bremse</span>
           </div>
           <button id="game-help" class="secondary" aria-label="Spielanleitung">
             ?</button

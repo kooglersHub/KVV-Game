@@ -50,6 +50,26 @@ test('visitors can zoom the page on smaller displays', async () => {
   assert.doesNotMatch(html, /maximum-scale|user-scalable=no/);
 });
 
+test('the browser module graph loads as JavaScript at its relative URLs', async () => {
+  const html = await (await fetch(origin)).text();
+  const entry = html.match(/<script type="module"[^>]+src="([^"]+)"/)[1];
+  const pending = [new URL(entry, origin).href];
+  const checked = new Set();
+  while (pending.length) {
+    const url = pending.pop();
+    if (checked.has(url)) continue;
+    checked.add(url);
+    const response = await fetch(url);
+    assert.equal(response.status, 200, url);
+    assert.match(response.headers.get('content-type'), /javascript/, url);
+    const source = await response.text();
+    for (const [, reference] of source.matchAll(/\bfrom\s+['"](\.[^'"]+)['"]/g)) {
+      pending.push(new URL(reference, url).href);
+    }
+  }
+  assert.ok(checked.size >= 4, 'game, network, dispatch policy, and train manager loaded');
+});
+
 test('missing assets return 404 instead of HTML', async () => {
   assert.equal((await fetch(`${origin}/missing.webp`)).status, 404);
 });

@@ -59,16 +59,17 @@ h1 em::after {
   right: 46px;
   bottom: 12px;
   height: 42px;
-  width: 570px;
-  gap: 10px;
-  letter-spacing: 1.3px;
+  width: 715px;
+  gap: 8px;
+  letter-spacing: 1px;
   color: #53634e;
   font-weight: 700;
 }
 .route-strip .stop-dot { display: grid; place-items: center; width: 25px; height: 25px; border: 2px solid #286b9b; border-radius: 50%; color: #286b9b; font-size: 11px; background: var(--paper); }
 .route-strip .stop-dot:nth-of-type(2) { border-color: #8d387e; color: #8d387e; }
 .route-strip .stop-dot:nth-of-type(3) { border-color: #966012; color: #966012; }
-.route-strip b { height: 2px; width: 27px; background: #c3cdb5; }
+.route-strip .stop-dot:nth-of-type(4) { border-color: #287764; color: #287764; }
+.route-strip b { height: 2px; width: 18px; background: #c3cdb5; }
 .ticket-stamp { position: absolute; right: 32px; bottom: 9px; transform: rotate(-5deg); border: 1px dashed #a5ae91; border-radius: 8px; padding: 7px 16px; color: #728368; font-size: 9px; letter-spacing: 1.5px; text-align: center; }
 .ticket-stamp strong { font-size: 15px; line-height: 1.4; }
 .ticket-stamp span { display: block; font-size: 5px; letter-spacing: .7px; }
