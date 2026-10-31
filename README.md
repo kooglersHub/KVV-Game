@@ -36,6 +36,8 @@ wird nicht durch einen Service Worker für Offlinebesuche zwischengespeichert.
 
 - Jede Bahn zeigt ihr Ziel: **D = Durlach, M = Marktplatz, H = Hauptbahnhof**.
 - Weichen anklicken oder antippen, um die Bahn zum passenden Gleis zu führen.
+- Alle Bahnen fahren mit derselben Grundgeschwindigkeit. Die Verkehrsphasen
+  erhöhen das Tempo gemeinsam; zufällig schnellere Nachzügler gibt es nicht.
 - Eine Bahn lässt sich einmal für zwei Sekunden bremsen. Nachfolgende Bahnen fahren weiter.
 - Richtige Ankünfte bringen 10 Punkte, ab vier richtigen Ankünften in Folge 20,
   ab sieben 30. Eine Fehlleitung setzt die Serie zurück.
@@ -50,12 +52,16 @@ Linien und Gleisplan sind spielerisch, kein realer Fahrplan.
 ## Tests und Veröffentlichung
 
 ```sh
-node --test tests/website.test.mjs
+node --test tests/*.test.mjs
 ```
 
 Die Tests starten einen eigenen Server auf Port 49337. Sie prüfen ausgelieferte
 Dateien, relative Assetpfade für GitHub Pages, erlaubtes Browser-Zoom sowie
 404-Antworten und den Schutz vor Zugriffen außerhalb von `dist/`.
+Zusätzliche Regressionstests prüfen die tatsächlich ausgelieferte Spawnlogik:
+keine schnelleren Nachzügler, gleiches Tempo vor Gleiswechseln und weiterhin
+gesperrter Spawn bei zu geringem Abstand. Das Website-Symbol verwendet dieselbe
+Originalgeometrie wie das KVV-Logo im Seitenkopf.
 
 GitHub Actions führt die Tests bei Pushes und Pull Requests aus. Nach einem
 erfolgreichen Push auf `main` veröffentlicht der Workflow den Inhalt von `dist/`
@@ -73,7 +79,12 @@ Unit-Testsuite und die TypeScript-Quellen sind im übergebenen ZIP nicht enthalt
 - `dist/assets/kvv-logo.svg`: unverändertes Logo von der offiziellen KVV-Website;
   das weiße Zeichen steht auf einer roten Fläche.
 - `dist/assets/index-*.js`, `dist/assets/index-*.css`: vorkompilierter Originalstand
-  aus `KVV-Weichenheld.zip`. Der Phaser-Spielcode wurde unverändert übernommen.
+  aus `KVV-Weichenheld.zip`. In `index-fair-traffic-v1.js` wurde ausschließlich
+  `trainSpeedVariants` von `[80,100,120,140]` auf `[100]` gesetzt, damit alle Bahnen
+  mit derselben Grundgeschwindigkeit fahren. Die drei gemeinsamen Tempophasen
+  und die Abstandskontrolle bleiben erhalten. Bei einer Änderung des Bundles
+  einen neuen Dateinamen verwenden und den Moduleintrag in `index.html` anpassen,
+  damit Browser keine veraltete Spielversion aus ihrem Cache laden.
 - `dist/assets/*.webp`: bereitgestellte Spielillustrationen.
 - `scripts/serve.mjs`: lokaler statischer Server ohne Abhängigkeiten.
 - `.github/workflows/pages.yml`: Tests und Veröffentlichung.
