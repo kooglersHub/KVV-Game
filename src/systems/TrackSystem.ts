@@ -3,6 +3,7 @@ import { Switch } from '../entities/Switch';
 import { GAME_CONFIG } from '../config/game.config';
 import { createKioskLayout, STATIONS } from '../config/kiosk.config';
 import type { GeneratedLayout, StopsMap } from '../types/layout';
+import { DESTINATIONS } from './DispatchRules';
 
 export class TrackSystem {
   private switches: Switch[] = [];
@@ -31,11 +32,16 @@ export class TrackSystem {
         padding: { x: 10, y: 4 },
       });
       graphics.fillStyle(0xfffcf1).fillRoundedRect(775, y - 65, 225, 37, 8);
-      this.scene.add.text(811, y - 57, STATIONS[index], {
-        fontFamily: 'Arial',
-        fontSize: '20px',
-        color: '#273d35',
-      });
+      this.scene.add.text(
+        811,
+        y - 57,
+        `${DESTINATIONS[index].badge} · ${STATIONS[index]}`,
+        {
+          fontFamily: 'Arial',
+          fontSize: '20px',
+          color: DESTINATIONS[index].color,
+        },
+      );
       graphics.fillStyle(0xf5c640).fillCircle(793, y - 47, 11);
       this.scene.add.text(786, y - 57, 'H', {
         fontSize: '18px',
@@ -71,11 +77,16 @@ export class TrackSystem {
       color: '#263d34',
     });
     this.scene.add
-      .text(1000, 495, 'WEICHEN ANTIPPEN  ·  ZUSAMMENSTÖSSE VERMEIDEN', {
-        fontSize: '13px',
-        fontFamily: 'Arial',
-        color: '#62776a',
-      })
+      .text(
+        1000,
+        495,
+        'ZIEL ERREICHEN  ·  SERIE AUFBAUEN  ·  BAHN ANTIPPEN ZUM BREMSEN',
+        {
+          fontSize: '13px',
+          fontFamily: 'Arial',
+          color: '#62776a',
+        },
+      )
       .setOrigin(1, 0);
   }
 

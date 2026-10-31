@@ -7,9 +7,16 @@ Schriften, Konten oder Internetverbindung im Spielbetrieb.
 
 ## Spielen
 
-Weichen antippen: Pfeil geradeaus oder abbiegen. Jede sicher rechts ausgefahrene
-Bahn bringt 10 Punkte. Bahnen halten kurz in Durlach, am Marktplatz und am
-Hauptbahnhof. Verhindere Zusammenstöße und sammle in 90 Sekunden möglichst viele Punkte.
+Jede Bahn zeigt ihr Ziel: **D = Durlach, M = Marktplatz, H = Hauptbahnhof**.
+Weichen antippen und die Bahn zum passenden Gleis leiten. Jede richtige Ankunft
+bringt 10 Punkte, ab der vierten richtigen Ankunft in Folge 20, ab der siebten 30.
+Ein falsches Ziel setzt die Serie zurück; drei Fehlleitungen oder ein Zusammenstoß
+beenden die Runde. Eine Bahn lässt sich durch Antippen einmal für zwei Sekunden
+bremsen; sie fährt automatisch weiter. Achtung: Die nachfolgende Bahn fährt weiter!
+
+Die ersten 20 Sekunden sind ruhig, ab Sekunde 20 beginnt der Stadtverkehr und ab
+Sekunde 50 der Feierabendverkehr. Nach 90 Sekunden kommen keine neuen Bahnen mehr;
+die letzten Bahnen dürfen ihre Ankunft noch abschließen.
 Die Linienbezeichnungen und der Gleisplan sind spielerisch und kein realer Fahrplan.
 
 - 72 × 72 Pixel große Weichen-Touchflächen; Hauptbuttons mindestens 64 Pixel hoch.

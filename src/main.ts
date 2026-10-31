@@ -114,7 +114,7 @@ function help(): void {
   element('dialog-kicker').textContent = 'SO WIRST DU ZUM WEICHENHELDEN';
   showDialog(
     'Drei Gleise. Du stellst die Weichen.',
-    '<ol class="steps"><li>Tippe eine runde Weiche an: → heißt geradeaus, / heißt abbiegen.</li><li>Schaffe Platz! An den Haltestellen warten Bahnen kurz. Verhindere Zusammenstöße.</li><li>Jede sicher ausgefahrene Bahn bringt 10 Punkte. Du hast 90 Sekunden.</li></ol>',
+    '<ol class="steps"><li>Jede Bahn hat ein Ziel: D = Durlach, M = Marktplatz, H = Hauptbahnhof. Stell die Weichen zum passenden Gleis.</li><li>Bahn antippen: einmal pro Bahn 2 Sekunden bremsen. Vorsicht vor auffahrenden Bahnen!</li><li>Richtig ankommen bringt 10–30 Punkte. Serien erhöhen den Bonus. Drei falsche Ziele oder ein Zusammenstoß beenden die Runde.</li></ol>',
     wasPlaying ? 'Weiterfahren →' : 'Jetzt spielen →',
     wasPlaying ? resume : start,
   );
@@ -139,15 +139,27 @@ element('fullscreen').onclick = async () => {
     console.warn('Vollbild ist in diesem Browser nicht verfügbar.', error);
   }
 };
+window.addEventListener('kvv:dispatch', (event) => {
+  const { name } = (event as CustomEvent<{ name: string }>).detail;
+  element('announcement').textContent = `Neue Bahn. Ziel: ${name}.`;
+});
 window.addEventListener('kvv:status', (event) => {
   const status = (event as CustomEvent<GameStatus>).detail;
   element('score').textContent = String(status.score);
   element('time').textContent =
     `${Math.floor(status.seconds / 60)}:${String(status.seconds % 60).padStart(2, '0')}`;
+  element('dispatch-status').textContent =
+    `${status.phase} · Serie ${status.streak} · Fehler ${status.mistakes}/3`;
 });
 window.addEventListener('kvv:result', (event) => {
-  const { reason, score, best } = (
-    event as CustomEvent<{ reason: string; score: number; best: number }>
+  const { reason, score, best, delivered, mistakes } = (
+    event as CustomEvent<{
+      reason: string;
+      score: number;
+      best: number;
+      delivered: number;
+      mistakes: number;
+    }>
   ).detail;
   playing = false;
   element('dialog-kicker').textContent =
@@ -155,8 +167,10 @@ window.addEventListener('kvv:result', (event) => {
   showDialog(
     reason === 'complete'
       ? 'Karlsruhe sagt: Danke fürs Fahren!'
-      : 'Hoppla! Da war ein Gleis besetzt.',
-    `<span class="result-score">${score}</span> Punkte<p>Dein Rekord: ${best} Punkte. Noch eine Runde?</p>`,
+      : reason === 'mistakes'
+        ? 'Drei Bahnen am falschen Ziel.'
+        : 'Hoppla! Da war ein Gleis besetzt.',
+    `<span class="result-score">${score}</span> Punkte<p>${delivered} Bahnen richtig geleitet · ${mistakes} Fehlleitungen<br>Dein Rekord: ${best} Punkte. Noch eine Runde?</p>`,
     'Nochmal spielen →',
     start,
   );

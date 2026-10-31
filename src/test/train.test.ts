@@ -73,6 +73,28 @@ describe('Train Entity', () => {
     expect(train.getCurrentTrack()).toBe('track4');
   });
 
+  it('allows one two-second brake and restores the previous velocity', () => {
+    const train = new Train(mockScene, 100, 'track2', 100);
+    train.active = true;
+    train.body.velocity.x = 100;
+    const callbacks: (() => void)[] = [];
+    mockScene.time.delayedCall.mockImplementation(
+      (delay: number, callback: () => void) => {
+        expect(delay).toBe(2000);
+        callbacks.push(callback);
+        return { paused: false };
+      },
+    );
+    const onResume = vi.fn();
+    expect(train.brakeOnce(onResume)).toBe(true);
+    expect(train.body.setVelocityX).toHaveBeenLastCalledWith(0);
+    expect(train.brakeOnce(onResume)).toBe(false);
+    callbacks[0]();
+    expect(train.body.setVelocityX).toHaveBeenLastCalledWith(100);
+    expect(onResume).toHaveBeenCalledOnce();
+    expect(train.brakeOnce(onResume)).toBe(false);
+  });
+
   it('should set generated stops correctly', () => {
     const mockStops = {
       stop1: { x: 400, track: 'track1', duration: 2000 },

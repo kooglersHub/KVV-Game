@@ -17,6 +17,12 @@ page.on('pageerror', (error) => {
 });
 await mkdir('test-results', { recursive: true });
 try {
+  await page.addInitScript(() => {
+    window.dispatches = [];
+    window.addEventListener('kvv:dispatch', (event) =>
+      window.dispatches.push(event.detail),
+    );
+  });
   await page.clock.install();
   await page.goto('http://127.0.0.1:3000');
   await page.locator('#start').waitFor();
@@ -37,8 +43,23 @@ try {
   await page.locator('#dialog-secondary').tap();
   assert.equal(await page.locator('#menu').isVisible(), true);
   await page.locator('#start').tap();
+  const first = await page.evaluate(() => window.dispatches.at(-1));
   await page.waitForTimeout(1200);
   assert.equal(await page.locator('#score').innerText(), '0');
+  if (first.source === 'track2')
+    await page.locator('canvas').tap({ position: { x: 180, y: 145 } });
+  if (first.source === 'track4')
+    await page.locator('canvas').tap({ position: { x: 180, y: 395 } });
+  if (first.target === 'track2')
+    await page.locator('canvas').tap({ position: { x: 430, y: 270 } });
+  if (first.target === 'track4')
+    await page.locator('canvas').tap({ position: { x: 680, y: 270 } });
+  await page.clock.runFor(15000);
+  assert.ok(
+    Number(await page.locator('#score').innerText()) >= 10,
+    'routing the first train to its destination earns points',
+  );
+  await page.screenshot({ path: 'test-results/gameplay.png' });
   await page.setViewportSize({ width: 800, height: 600 });
   await page.clock.runFor(100);
   const bounds = await page.locator('#kiosk').boundingBox();

@@ -3,6 +3,22 @@ import { createKioskLayout, ROUND_SECONDS } from '../config/kiosk.config';
 import { GAME_CONFIG } from '../config/game.config';
 
 describe('Touch kiosk layout', () => {
+  it('lets every entry track reach every destination', () => {
+    const layout = createKioskLayout();
+    for (const entry of ['track2', 'track3', 'track4']) {
+      let reachable = new Set([entry]);
+      for (const column of [180, 430, 680]) {
+        const next = new Set(reachable);
+        for (const connection of layout.connections.filter(
+          (item) => item.x === column,
+        )) {
+          if (reachable.has(connection.source)) next.add(connection.target);
+        }
+        reachable = next;
+      }
+      expect([...reachable].sort()).toEqual(['track2', 'track3', 'track4']);
+    }
+  });
   it('provides an escape switch on every active track before the stations', () => {
     const layout = createKioskLayout();
     for (const track of ['track2', 'track3', 'track4']) {

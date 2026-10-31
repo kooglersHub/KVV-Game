@@ -16,6 +16,7 @@ export class Train extends Phaser.GameObjects.Rectangle {
   private isStopped: boolean = false;
   private isPaused: boolean = false;
   private pausedVelocity: number = 0;
+  private brakeUsed = false;
   private stopTimer?: Phaser.Time.TimerEvent;
   private hasVisitedStops: Set<string> = new Set();
   private static generatedStops: StopsMap | null = null;
@@ -206,6 +207,18 @@ export class Train extends Phaser.GameObjects.Rectangle {
     if (this.stopTimer) {
       this.stopTimer.paused = true;
     }
+  }
+
+  brakeOnce(onResume: () => void): boolean {
+    if (this.brakeUsed || this.isPaused) return false;
+    this.brakeUsed = true;
+    this.pause();
+    this.scene.time.delayedCall(2000, () => {
+      if (!this.active) return;
+      this.resume();
+      onResume();
+    });
+    return true;
   }
 
   resume(): void {
