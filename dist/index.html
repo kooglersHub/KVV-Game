@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#bf263c" />
+    <title>KVV · Weichenheld</title>
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <script type="module" crossorigin src="./assets/index-Du8QXLjB.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BGAIqbdn.css">
+  </head>
+  <body>
+    <main id="kiosk" aria-label="KVV Weichenheld">
+      <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+      <header>
+        <a class="brand" href="#" aria-label="Zur Startseite"
+          ><span class="brand-mark">KVV<span>///</span></span
+          ><span class="brand-copy">Karlsruhe bewegt dich.</span></a
+        >
+        <div class="game-name">
+          WEICHENHELD<span>Dein Netz. Deine Mission.</span>
+        </div>
+        <button
+          id="fullscreen"
+          class="icon-button"
+          aria-label="Vollbild umschalten"
+        >
+          ⛶
+        </button>
+      </header>
+      <section id="play-area" aria-label="Spielfeld">
+        <div id="game-container"></div>
+        <div id="menu" class="screen">
+          <div class="intro">
+            <span class="eyebrow"><i></i> NÄCHSTER HALT: SPIELSPASS</span>
+            <h1>Ganz Karlsruhe.<br />In deiner Hand.</h1>
+            <p>
+              Stell die Weichen. Halte die Bahnen in Fahrt.<br />Und werde zum
+              Weichenhelden!
+            </p>
+            <button id="start" class="primary">
+              Los geht’s <span>→</span>
+            </button>
+            <div class="intro-meta">
+              <span>◷ 90 Sekunden</span><span>☝ Einfach antippen</span>
+            </div>
+          </div>
+          <div class="hero">
+            <img
+              src="./assets/city.webp"
+              alt="Fröhliche gelb-rote KVV-Bahnen in Karlsruhe"
+            /><span class="hero-sticker"
+              >Kleine Bahnen.<br />Große Mission.</span
+            >
+          </div>
+          <div class="route-strip">
+            <span>●</span> DU <b>──────</b> KARLSRUHE <b>──────</b>
+            <span>●</span> DEIN REKORD
+          </div>
+        </div>
+        <div id="overlay" class="overlay" hidden>
+          <section
+            class="dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dialog-title"
+            tabindex="-1"
+          >
+            <span class="eyebrow" id="dialog-kicker">KURZ ERKLÄRT</span>
+            <h2 id="dialog-title">Du hast die Weichen in der Hand.</h2>
+            <div id="dialog-content"></div>
+            <div class="dialog-actions">
+              <button id="dialog-primary" class="primary">Alles klar →</button
+              ><button id="dialog-secondary" class="secondary">
+                Zur Startseite
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+      <footer>
+        <div id="menu-footer" class="footer-content">
+          <img class="mascot" src="./assets/tram.webp" alt="KVV-Bahnfigur" />
+          <div class="footer-message">
+            <b>Einsteigen. Antippen. Spaß haben.</b
+            ><span>Das kleine Stellwerk für zwischendurch.</span>
+          </div>
+          <button id="help" class="secondary">? <span>So geht’s</span></button>
+          <div class="best">
+            <span>DEIN REKORD</span
+            ><strong id="best">0 <small>Punkte</small></strong>
+          </div>
+        </div>
+        <div id="game-footer" class="footer-content" hidden>
+          <div class="stat">
+            <span>PUNKTE</span><strong id="score">0</strong>
+          </div>
+          <div class="stat">
+            <span>RESTZEIT</span><strong id="time">1:30</strong>
+          </div>
+          <div class="game-tip">
+            <b id="dispatch-status">Einfahren · Serie 0 · Fehler 0/3</b>
+            <span>Ziel D / M / H beachten · Bahn antippen = Bremse</span>
+          </div>
+          <button id="game-help" class="secondary" aria-label="Spielanleitung">
+            ?</button
+          ><button id="pause" class="secondary">Ⅱ Pause</button>
+        </div>
+        <div class="footer-bottom">
+          <span>MIT LIEBE FÜR KARLSRUHE</span
+          ><span>KVV WEICHENHELD · SPIELPROTOTYP</span>
+        </div>
+      </footer>
+    </main>
+  </body>
+</html>
