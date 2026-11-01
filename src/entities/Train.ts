@@ -1,0 +1,238 @@
+import Phaser from 'phaser';
+import { TrackPosition } from '../types';
+import { GAME_CONFIG } from '../config/game.config';
+import { Switch } from './Switch';
+import type { StopsMap } from '../types/layout';
+
+export class Train extends Phaser.GameObjects.Rectangle {
+  private currentTrack: TrackPosition;
+  private speed: number;
+  private originalSpeed: number;
+  private hasSwitched: boolean = false;
+  private isSwitching: boolean = false;
+  private switchStartX: number = 0;
+  private switchStartY: number = 0;
+  private switchTargetY: number = 0;
+  private isStopped: boolean = false;
+  private isPaused: boolean = false;
+  private pausedVelocity: number = 0;
+  private brakeUsed = false;
+  private stopTimer?: Phaser.Time.TimerEvent;
+  private hasVisitedStops: Set<string> = new Set();
+  private static generatedStops: StopsMap | null = null;
+
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    track: TrackPosition,
+    speed: number = GAME_CONFIG.physics.trainSpeed,
+  ) {
+    const y = GAME_CONFIG.physics.tracks[track];
+
+    // Choose color based on speed
+    let color: number = GAME_CONFIG.colors.train;
+    if (speed <= 80) color = GAME_CONFIG.colors.trainSlow;
+    else if (speed >= 120 && speed < 140) color = GAME_CONFIG.colors.trainFast;
+    else if (speed >= 140) color = GAME_CONFIG.colors.trainVeryFast;
+
+    super(
+      scene,
+      x,
+      y,
+      GAME_CONFIG.graphics.trainWidth,
+      GAME_CONFIG.graphics.trainHeight,
+      color,
+    );
+
+    this.currentTrack = track;
+    this.speed = speed;
+    this.originalSpeed = speed;
+
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+
+    // Set velocity after a small delay to ensure physics body is ready
+    scene.time.delayedCall(10, () => {
+      const body = this.body as Phaser.Physics.Arcade.Body;
+      body.setVelocityX(this.speed);
+    });
+
+    // Hand-drawn style
+    this.setStrokeStyle(2, 0x000000);
+
+    this.setRotation(0);
+  }
+
+  update(): void {
+    if (this.isPaused) return;
+
+    if (this.isSwitching) {
+      this.updateSwitchMovement();
+    }
+    this.checkStops();
+  }
+
+  checkSwitch(switchObj: Switch): void {
+    if (this.hasSwitched || this.isSwitching) return;
+
+    const switchRange = 8;
+    const distance = this.x - switchObj.x;
+
+    if (distance >= 0 && distance < switchRange) {
+      const newTrack = switchObj.getTargetTrack(this.currentTrack);
+
+      if (newTrack !== this.currentTrack) {
+        this.setTrack(newTrack);
+        this.hasSwitched = true;
+        this.setData('switched', true);
+
+        // Reset switch flag when train passes
+        this.scene.time.delayedCall(500, () => {
+          this.hasSwitched = false;
+        });
+      }
+    }
+  }
+
+  getCurrentTrack(): TrackPosition {
+    return this.currentTrack;
+  }
+
+  setTrack(track: TrackPosition): void {
+    this.currentTrack = track;
+    const targetY = GAME_CONFIG.physics.tracks[track];
+
+    // Start realistic curved switching movement
+    this.isSwitching = true;
+    this.switchStartX = this.x;
+    this.switchStartY = this.y;
+    this.switchTargetY = targetY;
+  }
+
+  private updateSwitchMovement(): void {
+    const curveLength = 80; // Same as track connection curve length
+    const progress = (this.x - this.switchStartX) / curveLength;
+
+    if (progress >= 1) {
+      // Switching complete
+      this.isSwitching = false;
+      this.y = this.switchTargetY;
+      return;
+    }
+
+    // Follow the same quadratic curve as the track connections
+    const t = Math.max(0, Math.min(1, progress));
+    this.y =
+      this.switchStartY + (this.switchTargetY - this.switchStartY) * t * t;
+  }
+
+  static setGeneratedStops(stops: StopsMap): void {
+    Train.generatedStops = stops;
+  }
+
+  private checkStops(): void {
+    if (this.isStopped) return;
+
+    // Use dynamically generated stops (always set by MainScene)
+    if (!Train.generatedStops) {
+      console.warn('No generated stops available - skipping stop check');
+      return;
+    }
+
+    Object.entries(Train.generatedStops).forEach(([stopId, stop]) => {
+      if (this.hasVisitedStops.has(stopId)) return;
+
+      const stopRange = 30;
+      const isAtStop =
+        Math.abs(this.x - stop.x) < stopRange &&
+        this.currentTrack === stop.track;
+
+      if (isAtStop) {
+        this.stopAtStation(stopId, stop.duration);
+      }
+    });
+  }
+
+  private stopAtStation(stopId: string, duration: number): void {
+    this.isStopped = true;
+    this.hasVisitedStops.add(stopId);
+
+    // Stop the train
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocityX(0);
+
+    // Visual indication that train is stopped
+    this.setAlpha(0.7);
+
+    // Resume after duration
+    this.stopTimer = this.scene.time.delayedCall(duration, () => {
+      this.isStopped = false;
+      body.setVelocityX(this.speed);
+      this.setAlpha(1);
+    });
+  }
+
+  isOffScreen(): boolean {
+    return this.x > GAME_CONFIG.width + this.width;
+  }
+
+  getSpeed(): number {
+    return this.originalSpeed;
+  }
+
+  updateSpeedMultiplier(multiplier: number): void {
+    // Update current speed based on original speed and multiplier
+    this.speed = this.originalSpeed * multiplier;
+
+    // Update physics velocity if train is not stopped, not switching, and not paused
+    if (!this.isStopped && !this.isSwitching && !this.isPaused) {
+      const body = this.body as Phaser.Physics.Arcade.Body;
+      if (body) {
+        body.setVelocityX(this.speed);
+      }
+    }
+  }
+
+  pause(): void {
+    if (this.isPaused) return;
+
+    this.isPaused = true;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    if (body) {
+      this.pausedVelocity = body.velocity.x;
+      body.setVelocityX(0);
+    }
+
+    // Pause the stop timer if it exists
+    if (this.stopTimer) {
+      this.stopTimer.paused = true;
+    }
+  }
+
+  brakeOnce(onResume: () => void): boolean {
+    if (this.brakeUsed || this.isPaused) return false;
+    this.brakeUsed = true;
+    this.pause();
+    this.scene.time.delayedCall(2000, () => {
+      if (!this.active) return;
+      this.resume();
+      onResume();
+    });
+    return true;
+  }
+
+  resume(): void {
+    if (!this.isPaused) return;
+
+    this.isPaused = false;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    if (body && !this.isStopped) {
+      body.setVelocityX(this.pausedVelocity);
+    }
+
+    // Resume the stop timer if it exists
+    if (this.stopTimer) {
+      this.stopTimer.paused = false;
+    }
+  }
+}

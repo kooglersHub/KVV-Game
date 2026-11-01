@@ -1,0 +1,18 @@
+{
+  "name": "KVV Weichenheld",
+  "short_name": "Weichenheld",
+  "lang": "de",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf8f0",
+  "theme_color": "#bf263c",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

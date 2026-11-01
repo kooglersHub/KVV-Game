@@ -12,7 +12,10 @@ before(async () => {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error('Server did not start')), 5000);
+    const timeout = setTimeout(
+      () => reject(new Error('Server did not start')),
+      5000,
+    );
     server.once('error', reject);
     server.stdout.once('data', () => {
       clearTimeout(timeout);
@@ -32,14 +35,20 @@ test('page and manifest assets work beneath a GitHub Pages project path', async 
   assert.equal(response.status, 200);
   assert.match(response.headers.get('content-type'), /text\/html/);
   const html = await response.text();
-  const references = [...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map((match) => match[1]);
-  const manifest = JSON.parse(await readFile('dist/manifest.webmanifest', 'utf8'));
+  const references = [...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map(
+    (match) => match[1],
+  );
+  const manifest = JSON.parse(
+    await readFile('dist/manifest.webmanifest', 'utf8'),
+  );
   references.push(...manifest.icons.map((icon) => icon.src));
   for (const reference of references) {
     const nested = new URL(reference, 'https://example.com/KVV-Game/');
     assert.equal(nested.origin, 'https://example.com', reference);
     assert.ok(nested.pathname.startsWith('/KVV-Game/'), reference);
-    const asset = await fetch(`${origin}/${nested.pathname.slice('/KVV-Game/'.length)}`);
+    const asset = await fetch(
+      `${origin}/${nested.pathname.slice('/KVV-Game/'.length)}`,
+    );
     assert.equal(asset.status, 200, reference);
     assert.ok((await asset.arrayBuffer()).byteLength > 0, reference);
   }
@@ -63,11 +72,13 @@ test('the browser module graph loads as JavaScript at its relative URLs', async 
     assert.equal(response.status, 200, url);
     assert.match(response.headers.get('content-type'), /javascript/, url);
     const source = await response.text();
-    for (const [, reference] of source.matchAll(/\bfrom\s+['"](\.[^'"]+)['"]/g)) {
+    for (const [, reference] of source.matchAll(
+      /\bfrom\s+['"](\.[^'"]+)['"]/g,
+    )) {
       pending.push(new URL(reference, url).href);
     }
   }
-  assert.ok(checked.size >= 4, 'game, network, dispatch policy, and train manager loaded');
+  assert.ok(checked.size >= 1, 'the source-built game bundle loaded');
 });
 
 test('missing assets return 404 instead of HTML', async () => {
@@ -76,4 +87,14 @@ test('missing assets return 404 instead of HTML', async () => {
 
 test('requests cannot read files outside the website directory', async () => {
   assert.equal((await fetch(`${origin}/%2e%2e%2fREADME.md`)).status, 403);
+});
+
+test('the combined build keeps portrait orientation and all four destination markers', async () => {
+  const manifest = JSON.parse(
+    await readFile('dist/manifest.webmanifest', 'utf8'),
+  );
+  assert.equal(manifest.orientation, 'portrait');
+  const html = await (await fetch(origin)).text();
+  for (const badge of ['D', 'M', 'H', 'E'])
+    assert.ok(html.includes(`stop-dot">${badge}</span>`));
 });

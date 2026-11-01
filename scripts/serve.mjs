@@ -11,6 +11,7 @@ const types = {
   '.json': 'application/json',
   '.webmanifest': 'application/manifest+json',
   '.svg': 'image/svg+xml',
+  '.ogg': 'audio/ogg',
 };
 const port = Number(process.env.PORT || 3000);
 createServer(async (request, response) => {
