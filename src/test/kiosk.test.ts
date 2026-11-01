@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createKioskLayout, ROUND_SECONDS } from '../config/kiosk.config';
+import {
+  ARRIVAL_X,
+  createKioskLayout,
+  KIOSK_DISPLAY,
+  ROUND_SECONDS,
+  SWITCH_COLUMNS,
+} from '../config/kiosk.config';
 import { GAME_CONFIG } from '../config/game.config';
 
 describe('Touch kiosk layout', () => {
@@ -7,7 +13,7 @@ describe('Touch kiosk layout', () => {
     const layout = createKioskLayout();
     for (const entry of ['track2', 'track3', 'track4']) {
       let reachable = new Set([entry]);
-      for (const column of [180, 430, 680]) {
+      for (const column of SWITCH_COLUMNS) {
         const next = new Set(reachable);
         for (const connection of layout.connections.filter(
           (item) => item.x === column,
@@ -26,7 +32,9 @@ describe('Touch kiosk layout', () => {
         (connection) => connection.source === track,
       );
       expect(exits.length).toBeGreaterThan(0);
-      expect(exits.some((connection) => connection.x + 80 < 820)).toBe(true);
+      expect(exits.some((connection) => connection.x + 80 < ARRIVAL_X)).toBe(
+        true,
+      );
     }
     for (const connection of layout.connections) {
       expect(connection.x).toBeGreaterThan(36);
@@ -54,9 +62,15 @@ describe('Touch kiosk layout', () => {
   it('uses a short round and stations beyond the last diversion', () => {
     expect(ROUND_SECONDS).toBe(90);
     for (const station of Object.values(createKioskLayout().stops)) {
-      expect(station.x).toBeGreaterThan(760);
+      expect(station.x).toBeGreaterThan(SWITCH_COLUMNS[2] + 80);
       expect(station.x).toBeLessThan(GAME_CONFIG.width - 90);
       expect(station.duration).toBeLessThanOrEqual(2500);
     }
+  });
+
+  it('fills a portrait kiosk with room for the header and touch controls', () => {
+    expect(KIOSK_DISPLAY.width / KIOSK_DISPLAY.height).toBe(3 / 4);
+    expect(GAME_CONFIG.width).toBe(KIOSK_DISPLAY.width);
+    expect(88 + GAME_CONFIG.height + 232).toBe(KIOSK_DISPLAY.height);
   });
 });

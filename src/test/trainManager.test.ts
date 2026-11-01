@@ -34,6 +34,26 @@ describe('TrainManager', () => {
     expect(trainManager.getTrains()).toHaveLength(0);
   });
 
+  it('starts with a visible slow tram and over five seconds before its first switch', () => {
+    trainManager.setGeneratedLayout(createKioskLayout());
+    trainManager.updateSpeedMultiplier(0.65);
+    trainManager.startSpawning(6500, 100, {
+      x: 64,
+      track: 'track2',
+      speed: 50,
+    });
+    const [train] = trainManager.getTrains();
+    expect(train.x).toBe(64);
+    expect(train.getCurrentTrack()).toBe('track2');
+    expect(train.getSpeed()).toBe(50);
+    const firstSwitch = createKioskLayout().connections.find(
+      (point) => point.source === 'track2',
+    )!;
+    expect(
+      (firstSwitch.x - train.x) / (train.getSpeed() * 0.65),
+    ).toBeGreaterThan(5);
+  });
+
   it('spawns a first train with the kiosk layout despite switches beyond x=150', () => {
     trainManager.setGeneratedLayout(createKioskLayout());
     trainManager.startSpawning(2400);

@@ -30,7 +30,11 @@ export class TrainManager {
     this.currentScore = score;
   }
 
-  startSpawning(interval: number = 3000, speed: number = 100): void {
+  startSpawning(
+    interval: number = 3000,
+    speed: number = 100,
+    firstTrain?: { x: number; track: TrackPosition; speed: number },
+  ): void {
     this.defaultSpeed = speed;
     this.currentSpawnInterval = interval;
     this.spawnTimer = this.scene.time.addEvent({
@@ -40,8 +44,11 @@ export class TrainManager {
       loop: true,
     });
 
-    // Spawn first train immediately
-    this.spawnTrain();
+    if (firstTrain) {
+      this.addTrain(firstTrain.x, firstTrain.track, firstTrain.speed);
+    } else {
+      this.spawnTrain();
+    }
   }
 
   stopSpawning(): void {
@@ -111,15 +118,19 @@ export class TrainManager {
     for (const track of shuffledTracks) {
       const safeSpawn = this.findSafeSpawnForTrack(track);
       if (safeSpawn) {
-        const train = new Train(this.scene, -100, track, safeSpawn.speed);
-        this.trains.push(train);
-        this.trainGroup.add(train);
-        train.updateSpeedMultiplier(this.speedMultiplier);
+        this.addTrain(-100, track, safeSpawn.speed);
         return;
       }
     }
 
     // If no safe spawn found, don't spawn this time (reduced logging)
+  }
+
+  private addTrain(x: number, track: TrackPosition, speed: number): void {
+    const train = new Train(this.scene, x, track, speed);
+    this.trains.push(train);
+    this.trainGroup.add(train);
+    train.updateSpeedMultiplier(this.speedMultiplier);
   }
 
   private canPreventCollisions(tracks: TrackPosition[]): boolean {

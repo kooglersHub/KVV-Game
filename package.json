@@ -1,7 +1,7 @@
 {
   "name": "kvv-weichenheld",
   "version": "1.0.0",
-  "description": "KVV Weichenheld: lokales Touch-Weichenspiel für 1024 × 768 und Raspberry Pi",
+  "description": "KVV Weichenheld: lokales Touch-Weichenspiel für 768 × 1024 und Raspberry Pi",
   "engines": {
     "node": ">=22"
   },

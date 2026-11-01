@@ -31,7 +31,7 @@ export function trafficAt(elapsed: number): {
   speed: number;
   name: string;
 } {
-  if (elapsed < 20) return { interval: 4400, speed: 0.8, name: 'Einfahren' };
-  if (elapsed < 50) return { interval: 3000, speed: 1, name: 'Stadtverkehr' };
-  return { interval: 2200, speed: 1.15, name: 'Feierabendverkehr' };
+  if (elapsed < 25) return { interval: 6500, speed: 0.65, name: 'Einfahren' };
+  if (elapsed < 55) return { interval: 4200, speed: 0.8, name: 'Stadtverkehr' };
+  return { interval: 3000, speed: 0.95, name: 'Feierabendverkehr' };
 }

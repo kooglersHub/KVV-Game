@@ -49,6 +49,7 @@ vi.mock('phaser', () => ({
           this.x = x;
           this.y = y;
         }
+        setDepth = vi.fn().mockReturnThis();
         add = vi.fn().mockReturnThis();
         setOrigin = vi.fn().mockReturnThis();
         setInteractive = vi.fn().mockReturnThis();

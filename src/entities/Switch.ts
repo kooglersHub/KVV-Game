@@ -40,6 +40,8 @@ export class Switch extends Phaser.GameObjects.Container {
     this.draw();
 
     scene.add.existing(this);
+    // A tram approaching the point must not steal the switch's touch input.
+    this.setDepth(10);
   }
 
   private setupInteraction(): void {

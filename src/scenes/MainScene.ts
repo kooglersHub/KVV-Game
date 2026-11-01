@@ -4,7 +4,9 @@ import { CollisionManager } from '../systems/CollisionManager';
 import { TrackSystem } from '../systems/TrackSystem';
 import { StorageManager } from '../systems/StorageManager';
 import { Train } from '../entities/Train';
-import { ROUND_SECONDS } from '../config/kiosk.config';
+import { ARRIVAL_X } from '../config/kiosk.config';
+import { GAME_CONFIG } from '../config/game.config';
+import { RoundClock } from '../systems/RoundClock';
 import { notifyUI } from '../ui/events';
 import { prepareTramTexture } from '../ui/tramTexture';
 import {
@@ -17,7 +19,7 @@ export class MainScene extends Phaser.Scene {
   private trains!: TrainManager;
   private tracks!: TrackSystem;
   private rules = new DispatchRules();
-  private remaining = ROUND_SECONDS;
+  private clock = new RoundClock();
   private finished = false;
   private paused = false;
   private trainArt = new Map<Train, Phaser.GameObjects.Image>();
@@ -32,7 +34,7 @@ export class MainScene extends Phaser.Scene {
   create(): void {
     this.rules = new DispatchRules();
     this.dispatchCount = 0;
-    this.remaining = ROUND_SECONDS;
+    this.clock = new RoundClock();
     this.finished = false;
     this.paused = false;
     this.trainArt.clear();
@@ -41,36 +43,47 @@ export class MainScene extends Phaser.Scene {
     this.tracks = new TrackSystem(this);
     this.tracks.drawTracksWithSwitches();
     this.feedback = this.add
-      .text(
-        1000,
-        26,
-        'Ziel auf der Bahn beachten!\nBahn antippen = einmal 2 s bremsen',
-        {
-          fontFamily: 'Arial',
-          fontSize: '17px',
-          color: '#3f6149',
-          align: 'right',
-          lineSpacing: 6,
-        },
-      )
-      .setOrigin(1, 0);
+      .text(32, 77, this.preparationHint(), {
+        fontFamily: 'Arial',
+        fontSize: '21px',
+        color: '#3f6149',
+        align: 'left',
+        lineSpacing: 6,
+      })
+      .setOrigin(0, 0);
     Train.setGeneratedStops(this.tracks.getGeneratedStops());
     this.trains = new TrainManager(this);
     this.trains.setGeneratedLayout(this.tracks.getGeneratedLayout());
     const collisions = new CollisionManager(this);
     collisions.setupCollisions(this.trains.getTrainGroup());
     collisions.onCollision(() => this.finish('collision'));
-    this.trains.updateSpeedMultiplier(trafficAt(0).speed);
-    this.trains.startSpawning(trafficAt(0).interval);
     this.time.addEvent({
       delay: 1000,
       loop: true,
       callback: () => {
-        if (this.paused || this.finished || this.remaining === 0) return;
-        if (this.remaining > 0) this.remaining--;
-        const traffic = trafficAt(ROUND_SECONDS - this.remaining);
+        if (this.paused || this.finished || this.clock.remaining === 0) return;
+        const wasPreparing = this.clock.preparing;
+        this.clock.tick();
+        if (wasPreparing) {
+          this.feedback.setText(this.preparationHint());
+          if (!this.clock.preparing) {
+            const traffic = trafficAt(0);
+            this.trains.updateSpeedMultiplier(traffic.speed);
+            // A visible, predictable first tram gives over five seconds to react.
+            this.trains.startSpawning(traffic.interval, 100, {
+              x: 64,
+              track: 'track2',
+              speed: 50,
+            });
+            // Let the learning tram arrive before faster traffic can catch it.
+            this.trains.pauseSpawning();
+          }
+          this.report();
+          return;
+        }
+        const traffic = trafficAt(this.clock.elapsed);
         this.trains.updateSpeedMultiplier(traffic.speed);
-        if (this.remaining > 0)
+        if (this.clock.remaining > 0)
           this.trains.updateSpawnInterval(traffic.interval);
         else this.trains.stopSpawning();
         this.report();
@@ -103,12 +116,16 @@ export class MainScene extends Phaser.Scene {
       art.setPosition(train.x, train.y).setAlpha(train.alpha);
       this.labels
         .get(train)
-        ?.setPosition(train.x, train.y + (train.getData('scored') ? 36 : -39));
+        ?.setPosition(
+          Phaser.Math.Clamp(train.x, 96, GAME_CONFIG.width - 96),
+          train.y + (train.getData('scored') ? 36 : -43),
+        );
       this.tracks.getSwitches().forEach((point) => train.checkSwitch(point));
-      if (train.x >= 820 && !train.getData('scored')) {
+      if (train.x >= ARRIVAL_X && !train.getData('scored')) {
         train.setData('scored', true);
         const target = DESTINATIONS[train.getData('destination') as number];
         const points = this.rules.arrive(train.getCurrentTrack(), target.track);
+        if (this.dispatchCount === 1) this.trains.resumeSpawning();
         const label = this.labels.get(train);
         label?.setText(
           points ? `+${points} · Angekommen!` : `Ziel war ${target.badge}!`,
@@ -129,7 +146,7 @@ export class MainScene extends Phaser.Scene {
     });
     if (
       !this.finished &&
-      this.remaining === 0 &&
+      this.clock.remaining === 0 &&
       this.trains.getTrains().every((train) => train.getData('scored'))
     )
       this.finish('complete');
@@ -139,7 +156,7 @@ export class MainScene extends Phaser.Scene {
     const current = DESTINATIONS.findIndex(
       (destination) => destination.track === train.getCurrentTrack(),
     );
-    // The first train needs a diversion; every target remains reachable before x=680.
+    // Every destination remains reachable before the final switch column.
     const targetIndex =
       (current + 1 + (this.dispatchCount++ % 2)) % DESTINATIONS.length;
     const target = DESTINATIONS[targetIndex];
@@ -152,7 +169,7 @@ export class MainScene extends Phaser.Scene {
     const label = this.add
       .text(train.x, train.y - 39, `${target.badge} · ${target.name}`, {
         fontFamily: 'Arial',
-        fontSize: '16px',
+        fontSize: '18px',
         fontStyle: 'bold',
         color: '#ffffff',
         backgroundColor: target.color,
@@ -187,6 +204,12 @@ export class MainScene extends Phaser.Scene {
     });
   }
 
+  private preparationHint(): string {
+    return this.clock.preparing
+      ? `Abfahrt in ${this.clock.preparation} · Schau dir die Weichen an.\nErstes Ziel: M Marktplatz · obere Weiche antippen.`
+      : 'Los geht’s! Erste Bahn → M Marktplatz.\nDie obere Weiche führt auf das mittlere Gleis.';
+  }
+
   setPaused(paused: boolean): void {
     if (this.finished) return;
     this.paused = paused;
@@ -199,14 +222,16 @@ export class MainScene extends Phaser.Scene {
   private report(): void {
     notifyUI('status', {
       score: this.rules.score,
-      seconds: this.remaining,
+      seconds: this.clock.remaining,
       paused: this.paused,
       streak: this.rules.streak,
       mistakes: this.rules.mistakes,
-      phase:
-        this.remaining === 0
+      preparation: this.clock.preparation,
+      phase: this.clock.preparing
+        ? `Abfahrt in ${this.clock.preparation}`
+        : this.clock.remaining === 0
           ? 'Letzte Bahnen'
-          : trafficAt(ROUND_SECONDS - this.remaining).name,
+          : trafficAt(this.clock.elapsed).name,
     });
   }
 

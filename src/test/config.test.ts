@@ -12,8 +12,8 @@ describe('Game Configuration', () => {
   it('should have valid game dimensions', () => {
     expect(GAME_CONFIG.width).toBeGreaterThan(0);
     expect(GAME_CONFIG.height).toBeGreaterThan(0);
-    expect(GAME_CONFIG.width).toBe(1024);
-    expect(GAME_CONFIG.height).toBe(540);
+    expect(GAME_CONFIG.width).toBe(768);
+    expect(GAME_CONFIG.height).toBe(704);
   });
 
   it('should have 6 tracks defined (including level 2)', () => {

@@ -1,16 +1,16 @@
 export const GAME_CONFIG = {
-  width: 1024,
-  height: 540,
+  width: 768,
+  height: 704,
   backgroundColor: '#eef1e4',
 
   physics: {
     tracks: {
       track1: 70,
-      track2: 145,
-      track3: 270,
-      track4: 395,
-      track5: 465,
-      track6: 510,
+      track2: 226,
+      track3: 394,
+      track4: 562,
+      track5: 635,
+      track6: 680,
     },
     trainSpeed: 100, // base pixels per second
     trainSpeedVariants: [80, 100, 120, 140], // Different speed options

@@ -2,7 +2,11 @@ import Phaser from 'phaser';
 import { GAME_CONFIG } from './config/game.config';
 import { MainScene } from './scenes/MainScene';
 import { StorageManager } from './systems/StorageManager';
-import { KIOSK_IDLE_SECONDS } from './config/kiosk.config';
+import {
+  KIOSK_DISPLAY,
+  KIOSK_IDLE_SECONDS,
+  ROUND_SECONDS,
+} from './config/kiosk.config';
 import type { GameStatus } from './ui/events';
 import './style.css';
 
@@ -63,6 +67,7 @@ function showDialog(
 }
 
 function start(): void {
+  lastInput = Date.now();
   closeDialog();
   element('menu').hidden = true;
   element('menu-footer').hidden = true;
@@ -87,6 +92,7 @@ function home(): void {
 }
 
 function resume(): void {
+  lastInput = Date.now();
   closeDialog();
   paused = false;
   scene.setPaused(false);
@@ -114,7 +120,7 @@ function help(): void {
   element('dialog-kicker').textContent = 'SO WIRST DU ZUM WEICHENHELDEN';
   showDialog(
     'Drei Gleise. Du stellst die Weichen.',
-    '<ol class="steps"><li>Jede Bahn hat ein Ziel: D = Durlach, M = Marktplatz, H = Hauptbahnhof. Stell die Weichen zum passenden Gleis.</li><li>Bahn antippen: einmal pro Bahn 2 Sekunden bremsen. Vorsicht vor auffahrenden Bahnen!</li><li>Richtig ankommen bringt 10–30 Punkte. Serien erhöhen den Bonus. Drei falsche Ziele oder ein Zusammenstoß beenden die Runde.</li></ol>',
+    '<ol class="steps"><li>Zuerst hast du 5 Sekunden zum Umschauen. Deine erste Bahn fährt extra langsam zum Marktplatz.</li><li>Das Schild auf der Bahn zeigt ihr Ziel: D = Durlach, M = Marktplatz, H = Hauptbahnhof. Runde Weichen antippen: Grün bedeutet Abzweig.</li><li>Bahn antippen: einmal 2 Sekunden bremsen. Die Bahn dahinter fährt weiter!</li><li>Richtige Ziele bringen 10–30 Punkte. Drei falsche Ziele oder ein Zusammenstoß beenden die Runde.</li></ol>',
     wasPlaying ? 'Weiterfahren →' : 'Jetzt spielen →',
     wasPlaying ? resume : start,
   );
@@ -148,8 +154,17 @@ window.addEventListener('kvv:status', (event) => {
   element('score').textContent = String(status.score);
   element('time').textContent =
     `${Math.floor(status.seconds / 60)}:${String(status.seconds % 60).padStart(2, '0')}`;
-  element('dispatch-status').textContent =
-    `${status.phase} · Serie ${status.streak} · Fehler ${status.mistakes}/3`;
+  element('dispatch-status').textContent = status.phase;
+  element('streak').textContent = String(status.streak);
+  element('mistakes').textContent = `${status.mistakes}/3`;
+  element('round-progress').style.width =
+    `${(status.seconds / ROUND_SECONDS) * 100}%`;
+  element('game-footer').classList.toggle('preparing', status.preparation > 0);
+  element('time').classList.toggle('urgent', status.seconds <= 15);
+  element('game-instruction').textContent =
+    status.preparation > 0
+      ? 'Du kannst die Weichen schon stellen. Die Zeit läuft noch nicht.'
+      : 'Ziel auf der Bahn beachten · Runde Weichen antippen';
 });
 window.addEventListener('kvv:result', (event) => {
   const { reason, score, best, delivered, mistakes } = (
@@ -209,7 +224,10 @@ setInterval(() => {
     home();
 }, 1000);
 function resize(): void {
-  const scale = Math.min(window.innerWidth / 1024, window.innerHeight / 768);
+  const scale = Math.min(
+    window.innerWidth / KIOSK_DISPLAY.width,
+    window.innerHeight / KIOSK_DISPLAY.height,
+  );
   element('kiosk').style.transform = `scale(${scale})`;
 }
 window.addEventListener('resize', resize);

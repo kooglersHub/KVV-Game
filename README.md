@@ -1,7 +1,9 @@
 # KVV · Weichenheld
 
 Spielbarer Touchscreen-Prototyp auf Basis von [mojzis/traingame](https://github.com/mojzis/traingame).
-Ziel: ein älterer Fahrkartenautomat mit 15-Zoll-Touchscreen, vorläufig **1024 × 768 Pixel**.
+Ziel: der auf den drei Gerätefotos gezeigte Fahrkartenautomat mit Hochkant-Touchscreen.
+Die Oberfläche ist auf **768 × 1024 Pixel (3:4)** ausgelegt. Die native Auflösung und
+die tatsächliche Touch-Genauigkeit müssen am Automaten noch geprüft werden.
 Lokaler Browserbetrieb auf Windows und Raspberry Pi OS; keine externen Dienste,
 Schriften, Konten oder Internetverbindung im Spielbetrieb.
 
@@ -14,12 +16,22 @@ Ein falsches Ziel setzt die Serie zurück; drei Fehlleitungen oder ein Zusammens
 beenden die Runde. Eine Bahn lässt sich durch Antippen einmal für zwei Sekunden
 bremsen; sie fährt automatisch weiter. Achtung: Die nachfolgende Bahn fährt weiter!
 
-Die ersten 20 Sekunden sind ruhig, ab Sekunde 20 beginnt der Stadtverkehr und ab
-Sekunde 50 der Feierabendverkehr. Nach 90 Sekunden kommen keine neuen Bahnen mehr;
+Vor jeder Runde gibt es **5 Sekunden Orientierung**, ohne die Spielzeit zu verkürzen.
+Weichen lassen sich dabei bereits stellen. Die erste Bahn ist immer sichtbar auf
+dem oberen Gleis, fährt extra langsam und hat das Ziel **M = Marktplatz**. Ab ihrem
+Erscheinen bleiben gut fünf Sekunden bis zur ersten Weiche.
+Bis zu ihrem ersten Halt fährt diese Einführungsbahn allein; danach beginnt der
+reguläre Verkehr. Der Countdown friert beim Pausieren ebenfalls ein.
+
+Die ersten 25 Spielsekunden sind ruhig, ab Sekunde 25 beginnt der Stadtverkehr und ab
+Sekunde 55 der Feierabendverkehr. Nach 90 Sekunden kommen keine neuen Bahnen mehr;
 die letzten Bahnen dürfen ihre Ankunft noch abschließen.
 Die Linienbezeichnungen und der Gleisplan sind spielerisch und kein realer Fahrplan.
 
 - 72 × 72 Pixel große Weichen-Touchflächen; Hauptbuttons mindestens 64 Pixel hoch.
+- Weichen erhalten bei überlappenden Touchflächen Vorrang vor heranfahrenden Bahnen.
+- Aktive Abzweige werden grün hervorgehoben; Zielschilder kombinieren Buchstaben und Farben.
+- Separate Anzeigen für Punkte, Restzeit, Serie und Fehler sowie ein Zeitbalken.
 - Anleitung, Pause, Fortsetzen, Ergebnis und Neustart vollständig per Touch.
 - Lokaler Rekord; bei gesperrtem Browserspeicher bleibt das Spiel nutzbar.
 - Nach 60 Sekunden ohne Eingabe zurück zum Start. Pause bei verborgenem Browserfenster.
@@ -58,7 +70,7 @@ sh Start-Pi.sh
 ```
 
 Das Skript startet den lokalen Server und Chromium im Kioskmodus. Für die endgültige
-Installation Bildschirmrotation, 1024 × 768, Touch-Kalibrierung, Bildschirmschoner
+Installation Bildschirmrotation, 768 × 1024, Touch-Kalibrierung, Bildschirmschoner
 und den Autostart passend zum konkreten Raspberry Pi OS konfigurieren.
 
 ### Leistungsbudget und Abnahme
@@ -77,8 +89,13 @@ Garantie. Vor dem Automatenbetrieb prüfen:
 3. Mehrere vollständige Runden, Kollision, Pause, Neustart und Inaktivitätsrückkehr.
 4. Kaltstart ohne Netz, Vollbild, Wiederanlauf nach Stromverlust.
 
-Die Oberfläche skaliert proportional und behält ihr 4:3-Format. Kleinere Displays
-verkleinern auch die Touchflächen; der Automat ist deshalb bei 1024 × 768 abzunehmen.
+Die Oberfläche skaliert proportional und behält ihr 3:4-Hochkantformat. Andere
+Seitenverhältnisse erhalten Außenränder. Eine Drehung des Betriebssystems muss auch
+auf die Touch-Eingaben angewendet werden. Kleinere Displays verkleinern die
+Touchflächen; die Abnahme erfolgt deshalb auf dem realen Automaten.
+
+Automatisiert im Chromium-Browser geprüft: 768 × 1024, 600 × 800, 1080 × 1920 und
+1024 × 768. Diese Prüfung ersetzt keinen Test der tatsächlichen Automatenhardware.
 
 ## Qualität prüfen
 
@@ -104,7 +121,7 @@ Unit-Tests und Build aus. Die übernommenen Test-Doubles enthalten noch explizit
 ## Projektstruktur
 
 - `src/entities/`: Bahnen und Touch-Weichen der angepassten TrainGame-Basis.
-- `src/systems/`: Zugverwaltung, Kollision, Gleise und Speicherung.
+- `src/systems/`: Zugverwaltung, Kollision, Gleise, Runden-/Vorbereitungszeit und Speicherung.
 - `src/config/kiosk.config.ts`: Rundenlänge, Inaktivität, Haltestellen und Gleisplan.
 - `src/scenes/MainScene.ts`: Spielrunde und Szenenlebenszyklus.
 - `src/main.ts`, `src/style.css`: Touch-Oberfläche und Browserintegration.
@@ -119,4 +136,4 @@ Web-App-Manifest ist vorhanden. Native Windows-/Android-Pakete, Store-Veröffent
 und Service-Worker-Caching sind noch nicht umgesetzt. Für den Automaten funktioniert
 Offlinebetrieb bereits über den lokalen Server mit allen Dateien auf dem Gerät.
 
-Stand: 31. Oktober 2026. Basis-Commit: `0b8673fd94f2c11e01374c2b19c07e7f70527c06`.
+Stand: 1. November 2026. Basis-Commit: `0b8673fd94f2c11e01374c2b19c07e7f70527c06`.

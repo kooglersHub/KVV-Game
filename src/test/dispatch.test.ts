@@ -20,9 +20,11 @@ describe('Dispatch scoring', () => {
     expect(rules.arrive('track4', 'track4')).toBe(10);
   });
   it('increases traffic independently of the score', () => {
-    expect(trafficAt(0).interval).toBe(4400);
-    expect(trafficAt(20).interval).toBe(3000);
-    expect(trafficAt(50).interval).toBe(2200);
-    expect(trafficAt(90).speed).toBe(1.15);
+    expect(trafficAt(0).interval).toBe(6500);
+    expect(trafficAt(24).interval).toBe(6500);
+    expect(trafficAt(25).interval).toBe(4200);
+    expect(trafficAt(54).interval).toBe(4200);
+    expect(trafficAt(55).interval).toBe(3000);
+    expect(trafficAt(90).speed).toBe(0.95);
   });
 });

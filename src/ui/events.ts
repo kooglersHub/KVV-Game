@@ -5,6 +5,7 @@ export interface GameStatus {
   streak: number;
   mistakes: number;
   phase: string;
+  preparation: number;
 }
 
 export function notifyUI(type: string, detail: unknown = {}): void {

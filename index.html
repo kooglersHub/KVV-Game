@@ -44,7 +44,7 @@
               Los geht’s <span>→</span>
             </button>
             <div class="intro-meta">
-              <span>◷ 90 Sekunden</span><span>☝ Einfach antippen</span>
+              <span>◷ 90 Sekunden</span><span>5 Sekunden zum Ankommen</span>
             </div>
           </div>
           <div class="hero">
@@ -100,13 +100,24 @@
           <div class="stat">
             <span>RESTZEIT</span><strong id="time">1:30</strong>
           </div>
+          <div class="stat">
+            <span>SERIE</span><strong id="streak">0</strong>
+          </div>
+          <div class="stat">
+            <span>FEHLER</span><strong id="mistakes">0/3</strong>
+          </div>
           <div class="game-tip">
-            <b id="dispatch-status">Einfahren · Serie 0 · Fehler 0/3</b>
-            <span>Ziel D / M / H beachten · Bahn antippen = Bremse</span>
+            <b id="dispatch-status">Gleich geht’s los</b>
+            <span id="game-instruction"
+              >Ziel auf der Bahn beachten · Runde Weichen antippen</span
+            >
           </div>
           <button id="game-help" class="secondary" aria-label="Spielanleitung">
             ?</button
           ><button id="pause" class="secondary">Ⅱ Pause</button>
+        </div>
+        <div class="round-track" aria-hidden="true">
+          <div id="round-progress"></div>
         </div>
         <div class="footer-bottom">
           <span>MIT LIEBE FÜR KARLSRUHE</span
