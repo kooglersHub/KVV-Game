@@ -59,17 +59,17 @@ try {
   await page.clock.runFor(4500);
   assert.equal(await page.evaluate(() => window.dispatches.length), 1);
   assert.deepEqual(await page.evaluate(() => window.dispatches[0]), {
-    source: 'track2',
-    target: 'track3',
+    source: 'track1',
+    target: 'track2',
     name: 'Marktplatz',
   });
   await shot('first-tram');
   await page.clock.runFor(3000);
   assert.equal(await page.locator('#score').innerText(), '0');
-  await page.locator('canvas').tap({ position: { x: 240, y: 226 } });
+  await page.locator('canvas').tap({ position: { x: 210, y: 210 } });
   await page.clock.runFor(120);
   await shot('game');
-  await page.clock.runFor(15500);
+  await page.clock.runFor(21000);
   assert.ok(
     Number(await page.locator('#score').innerText()) >= 10,
     'first tram can still be routed after three seconds',
@@ -116,7 +116,7 @@ try {
   }
   await page.locator('#start').tap();
   await page.clock.runFor(6000);
-  await page.locator('canvas').tap({ position: { x: 240, y: 226 } });
+  await page.locator('canvas').tap({ position: { x: 210, y: 210 } });
   for (let step = 0; step < 9; step++) {
     await page.clock.runFor(15000);
     if (await page.locator('#overlay').isVisible()) break;

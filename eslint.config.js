@@ -23,6 +23,8 @@ export default [
         vi: 'readonly',
         HTMLElement: 'readonly',
         HTMLAnchorElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLAudioElement: 'readonly',
         CustomEvent: 'readonly',
         setInterval: 'readonly',
       },

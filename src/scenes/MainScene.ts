@@ -4,6 +4,7 @@ import { CollisionManager } from '../systems/CollisionManager';
 import { TrackSystem } from '../systems/TrackSystem';
 import { StorageManager } from '../systems/StorageManager';
 import { Train } from '../entities/Train';
+import { INTRO_TRAIN } from '../config/network.config';
 import { ARRIVAL_X } from '../config/kiosk.config';
 import { GAME_CONFIG } from '../config/game.config';
 import { RoundClock } from '../systems/RoundClock';
@@ -53,7 +54,6 @@ export class MainScene extends Phaser.Scene {
       .setOrigin(0, 0);
     Train.setGeneratedStops(this.tracks.getGeneratedStops());
     this.trains = new TrainManager(this);
-    this.trains.setGeneratedLayout(this.tracks.getGeneratedLayout());
     const collisions = new CollisionManager(this);
     collisions.setupCollisions(this.trains.getTrainGroup());
     collisions.onCollision(() => this.finish('collision'));
@@ -70,11 +70,7 @@ export class MainScene extends Phaser.Scene {
             const traffic = trafficAt(0);
             this.trains.updateSpeedMultiplier(traffic.speed);
             // A visible, predictable first tram gives over five seconds to react.
-            this.trains.startSpawning(traffic.interval, 100, {
-              x: 64,
-              track: 'track2',
-              speed: 50,
-            });
+            this.trains.startSpawning(traffic.interval, INTRO_TRAIN);
             // Let the learning tram arrive before faster traffic can catch it.
             this.trains.pauseSpawning();
           }
@@ -153,14 +149,9 @@ export class MainScene extends Phaser.Scene {
   }
 
   private assignDestination(train: Train, art: Phaser.GameObjects.Image): void {
-    const current = DESTINATIONS.findIndex(
-      (destination) => destination.track === train.getCurrentTrack(),
-    );
-    // Every destination remains reachable before the final switch column.
-    const targetIndex =
-      (current + 1 + (this.dispatchCount++ % 2)) % DESTINATIONS.length;
+    const targetIndex = train.getData('destination') as number;
     const target = DESTINATIONS[targetIndex];
-    train.setData('destination', targetIndex);
+    this.dispatchCount++;
     notifyUI('dispatch', {
       source: train.getCurrentTrack(),
       target: target.track,
@@ -206,8 +197,8 @@ export class MainScene extends Phaser.Scene {
 
   private preparationHint(): string {
     return this.clock.preparing
-      ? `Abfahrt in ${this.clock.preparation} · Schau dir die Weichen an.\nErstes Ziel: M Marktplatz · obere Weiche antippen.`
-      : 'Los geht’s! Erste Bahn → M Marktplatz.\nDie obere Weiche führt auf das mittlere Gleis.';
+      ? `Abfahrt in ${this.clock.preparation} · Schau dir die Weichen an.\nErstes Ziel: M · Weiche oben links antippen.`
+      : 'Los geht’s! Erste Bahn → M Marktplatz.\nDie Weiche oben links führt zum Marktplatz.';
   }
 
   setPaused(paused: boolean): void {

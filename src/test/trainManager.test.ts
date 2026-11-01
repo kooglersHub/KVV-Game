@@ -1,153 +1,132 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type Phaser from 'phaser';
 import { TrainManager } from '../systems/TrainManager';
+import { Train } from '../entities/Train';
+import { INTRO_TRAIN, DESTINATIONS } from '../config/network.config';
 import { createKioskLayout } from '../config/kiosk.config';
 
-describe('TrainManager', () => {
-  let mockScene: any;
-  let trainManager: TrainManager;
-
-  beforeEach(() => {
-    mockScene = {
+function createManager() {
+  const timers: {
+    delay: number;
+    paused: boolean;
+    destroy: ReturnType<typeof vi.fn>;
+  }[] = [];
+  const group = { add: vi.fn(), remove: vi.fn(), clear: vi.fn() };
+  const scene = {
+    add: { existing: vi.fn() },
+    physics: {
       add: {
-        existing: vi.fn().mockReturnThis(),
-      },
-      physics: {
-        add: {
-          group: vi.fn().mockReturnValue({
-            add: vi.fn(),
-            remove: vi.fn(),
-            clear: vi.fn(),
-          }),
-          existing: vi.fn().mockReturnThis(),
+        group: () => group,
+        existing: (train: Train) => {
+          train.body = {
+            setVelocityX: vi.fn(),
+          } as unknown as Phaser.Physics.Arcade.Body;
         },
       },
-      time: {
-        addEvent: vi.fn(),
-        delayedCall: vi.fn(),
+    },
+    time: {
+      delayedCall: vi.fn(),
+      addEvent: (settings: { delay: number }) => {
+        const timer = { ...settings, paused: false, destroy: vi.fn() };
+        timers.push(timer);
+        return timer;
       },
-    };
+    },
+  };
+  return {
+    manager: new TrainManager(scene as unknown as Phaser.Scene),
+    timers,
+    group,
+  };
+}
 
-    trainManager = new TrainManager(mockScene);
-  });
+beforeEach(() => Train.setGeneratedStops({}));
 
-  it('should initialize with empty train array', () => {
-    expect(trainManager.getTrains()).toHaveLength(0);
-  });
-
-  it('starts with a visible slow tram and over five seconds before its first switch', () => {
-    trainManager.setGeneratedLayout(createKioskLayout());
-    trainManager.updateSpeedMultiplier(0.65);
-    trainManager.startSpawning(6500, 100, {
-      x: 64,
-      track: 'track2',
-      speed: 50,
-    });
-    const [train] = trainManager.getTrains();
-    expect(train.x).toBe(64);
-    expect(train.getCurrentTrack()).toBe('track2');
-    expect(train.getSpeed()).toBe(50);
-    const firstSwitch = createKioskLayout().connections.find(
-      (point) => point.source === 'track2',
+describe('Combined destination-aware traffic', () => {
+  it('reserves a visible slow introduction before rendering', () => {
+    const { manager } = createManager();
+    manager.updateSpeedMultiplier(0.65);
+    manager.startSpawning(6500, INTRO_TRAIN);
+    const [train] = manager.getTrains();
+    expect(train.x).toBe(INTRO_TRAIN.x);
+    expect(train.getCurrentTrack()).toBe(INTRO_TRAIN.track);
+    expect(train.getData('destination')).toBe(1);
+    const point = createKioskLayout().connections.find(
+      (item) => item.source === INTRO_TRAIN.track,
     )!;
-    expect(
-      (firstSwitch.x - train.x) / (train.getSpeed() * 0.65),
-    ).toBeGreaterThan(5);
+    expect((point.x - train.x) / (train.getSpeed() * 0.65)).toBeGreaterThan(5);
   });
 
-  it('spawns a first train with the kiosk layout despite switches beyond x=150', () => {
-    trainManager.setGeneratedLayout(createKioskLayout());
-    trainManager.startSpawning(2400);
-    expect(trainManager.getTrains()).toHaveLength(1);
+  it('keeps introduction spawning paused when traffic phases change', () => {
+    const { manager, timers } = createManager();
+    manager.startSpawning(6500, INTRO_TRAIN);
+    manager.pauseSpawning();
+    manager.updateSpawnInterval(4200);
+    expect(timers[0].destroy).toHaveBeenCalledOnce();
+    expect(timers[1].paused).toBe(true);
+    manager.resumeSpawning();
+    expect(timers[1].paused).toBe(false);
+    manager.updateSpawnInterval(4200);
+    expect(timers).toHaveLength(2);
   });
 
-  it('checks the nearest following train rather than a distant lead train', () => {
-    trainManager.setGeneratedLayout(createKioskLayout());
-    trainManager.trains = [
-      { x: 950, getCurrentTrack: () => 'track2', getSpeed: () => 100 },
-      { x: 0, getCurrentTrack: () => 'track2', getSpeed: () => 100 },
-    ];
-    expect(trainManager.findSafeSpawnForTrack('track2')).toBeNull();
+  it('preserves destination quotas and speed caps over consecutive spawns', () => {
+    const { manager } = createManager();
+    for (let step = 0; step < 400; step++) {
+      const previous = [...manager.getTrains()];
+      manager.startSpawning(6500);
+      for (const train of manager
+        .getTrains()
+        .filter((candidate) => !previous.includes(candidate))) {
+        const target = train.getData('destination') as number;
+        expect(Number.isInteger(target)).toBe(true);
+        expect(DESTINATIONS[target].track).not.toBe(train.getCurrentTrack());
+        const matching = previous.filter(
+          (candidate) => candidate.getData('destination') === target,
+        );
+        expect(matching.length).toBeLessThan(2);
+        expect(
+          matching.every(
+            (candidate) => train.getSpeed() <= candidate.getSpeed(),
+          ),
+        ).toBe(true);
+      }
+      manager.getTrains().forEach((train) => {
+        train.x += 50;
+      });
+      manager.update();
+    }
   });
 
-  it('should set generated layout', () => {
-    const mockLayout = {
-      switches: { switch1: 200 },
-      stops: { stop1: { x: 400, track: 'track1', duration: 2000 } },
-      connections: [
-        { id: 'switch1', source: 'track1', target: 'track2', x: 200 },
-      ],
-    };
-
-    trainManager.setGeneratedLayout(mockLayout);
-    expect(trainManager.generatedLayout).toBe(mockLayout);
+  it('retains arrived trams until they leave the map and then frees capacity', () => {
+    const { manager, group } = createManager();
+    for (const [destination, stop] of DESTINATIONS.entries()) {
+      for (let index = 0; index < 2; index++)
+        manager.startSpawning(6500, {
+          x: 760,
+          track: stop.track,
+          speed: 100,
+          destination,
+        });
+    }
+    manager.startSpawning(6500);
+    expect(manager.getTrains()).toHaveLength(8);
+    manager.getTrains()[0].x = 1000;
+    manager.update();
+    expect(group.remove).toHaveBeenCalledOnce();
+    manager.startSpawning(6500);
+    expect(manager.getTrains()).toHaveLength(8);
+    expect(manager.getTrains().at(-1)?.getData('destination')).toBe(0);
   });
 
-  it('should start spawning with timer', () => {
-    trainManager.startSpawning(2000, 100);
-
-    expect(mockScene.time.addEvent).toHaveBeenCalledWith({
-      delay: 2000,
-      callback: expect.any(Function),
-      callbackScope: trainManager,
-      loop: true,
-    });
-  });
-
-  it('should stop spawning and clear timer', () => {
-    const mockTimer = { destroy: vi.fn() };
-    trainManager.spawnTimer = mockTimer;
-
-    trainManager.stopSpawning();
-    expect(mockTimer.destroy).toHaveBeenCalled();
-  });
-
-  it('should stop all trains', () => {
-    // Mock some trains with physics bodies
-    const mockTrain1 = {
-      body: { setVelocityX: vi.fn() },
-    };
-    const mockTrain2 = {
-      body: { setVelocityX: vi.fn() },
-    };
-
-    trainManager.trains = [mockTrain1, mockTrain2] as any;
-    trainManager.stopAllTrains();
-
-    expect(mockTrain1.body.setVelocityX).toHaveBeenCalledWith(0);
-    expect(mockTrain2.body.setVelocityX).toHaveBeenCalledWith(0);
-  });
-
-  it('should filter trains based on layout switches', () => {
-    const mockLayout = {
-      connections: [
-        { source: 'track1', target: 'track2', x: 200 },
-        { source: 'track2', target: 'track3', x: 400 },
-      ],
-    };
-
-    trainManager.setGeneratedLayout(mockLayout);
-
-    const track1Switches = trainManager.getAvailableSwitchesForTrack('track1');
-    const track3Switches = trainManager.getAvailableSwitchesForTrack('track3');
-
-    expect(track1Switches).toHaveLength(1);
-    expect(track1Switches[0].target).toBe('track2');
-    expect(track3Switches).toHaveLength(0);
-  });
-
-  it('should calculate safe distance based on available switches', () => {
-    const mockLayout = {
-      connections: [{ source: 'track1', target: 'track2', x: 300 }],
-    };
-
-    trainManager.setGeneratedLayout(mockLayout);
-
-    const safeDistanceWithSwitches =
-      trainManager.calculateSafeDistanceForTrack('track1');
-    const safeDistanceWithoutSwitches =
-      trainManager.calculateSafeDistanceForTrack('track5');
-
-    expect(safeDistanceWithSwitches).toBeGreaterThan(200);
-    expect(safeDistanceWithoutSwitches).toBe(600); // 3x base distance (200 * 3) for tracks with no switches
+  it('stops and clears the timer and all trams', () => {
+    const { manager, timers, group } = createManager();
+    manager.startSpawning(6500);
+    manager.clear();
+    expect(timers[0].destroy).toHaveBeenCalledOnce();
+    expect(group.clear).toHaveBeenCalledWith(false, false);
+    expect(manager.getTrains()).toHaveLength(0);
+    manager.updateSpawnInterval(3000);
+    expect(timers).toHaveLength(1);
   });
 });

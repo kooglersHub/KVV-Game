@@ -13,6 +13,8 @@ vi.mock('phaser', () => ({
         height: number;
         fillColor: number;
         body: any;
+        active = true;
+        private data = new Map<string, unknown>();
 
         constructor(
           scene: any,
@@ -32,8 +34,11 @@ vi.mock('phaser', () => ({
         }
         setStrokeStyle = vi.fn().mockReturnThis();
         setRotation = vi.fn().mockReturnThis();
-        setData = vi.fn().mockReturnThis();
-        getData = vi.fn();
+        setData = vi.fn((key: string, value: unknown) => {
+          this.data.set(key, value);
+          return this;
+        });
+        getData = vi.fn((key: string) => this.data.get(key));
         setAlpha = vi.fn().mockReturnThis();
         destroy = vi.fn();
       },

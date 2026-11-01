@@ -14,7 +14,7 @@ export class TrackSystem {
 
   drawTracksWithSwitches(): void {
     const graphics = this.scene.add.graphics();
-    const tracks = ['track2', 'track3', 'track4'] as const;
+    const tracks = DESTINATIONS.map((destination) => destination.track);
     tracks.forEach((track, index) => {
       const y = GAME_CONFIG.physics.tracks[track];
       graphics
@@ -26,7 +26,7 @@ export class TrackSystem {
       graphics.lineStyle(3, 0x7d8d82);
       graphics.lineBetween(0, y - 7, GAME_CONFIG.width, y - 7);
       graphics.lineBetween(0, y + 7, GAME_CONFIG.width, y + 7);
-      this.scene.add.text(24, y - 87, ['S2', 'S1', 'S4'][index], {
+      this.scene.add.text(24, y + 24, DESTINATIONS[index].line, {
         fontFamily: 'Arial',
         fontSize: '18px',
         fontStyle: 'bold',
@@ -34,8 +34,8 @@ export class TrackSystem {
         backgroundColor: '#d8e6cd',
         padding: { x: 10, y: 4 },
       });
-      graphics.fillStyle(0xfffcf1).fillRoundedRect(520, y - 87, 224, 42, 10);
-      this.scene.add.text(569, y - 75, DESTINATIONS[index].name, {
+      graphics.fillStyle(0xfffcf1).fillRoundedRect(520, y - 100, 224, 42, 10);
+      this.scene.add.text(569, y - 88, DESTINATIONS[index].name, {
         fontFamily: 'Arial',
         fontSize: '20px',
         color: DESTINATIONS[index].color,
@@ -43,8 +43,8 @@ export class TrackSystem {
       const color = Phaser.Display.Color.HexStringToColor(
         DESTINATIONS[index].color,
       ).color;
-      graphics.fillStyle(color).fillRoundedRect(520, y - 87, 38, 42, 10);
-      this.scene.add.text(531, y - 79, DESTINATIONS[index].badge, {
+      graphics.fillStyle(color).fillRoundedRect(520, y - 100, 38, 42, 10);
+      this.scene.add.text(531, y - 92, DESTINATIONS[index].badge, {
         fontSize: '23px',
         fontFamily: 'Arial',
         fontStyle: 'bold',
@@ -52,7 +52,7 @@ export class TrackSystem {
       });
       graphics
         .fillStyle(0xecc768)
-        .fillRoundedRect(STATION_X - 42, y + 29, 84, 12, 5);
+        .fillRoundedRect(STATION_X - 42, y + 24, 68, 9, 4);
     });
     this.connections = this.scene.add.graphics().setDepth(-1);
     this.generatedLayout.connections.forEach(({ x, source, target }) => {
@@ -78,14 +78,14 @@ export class TrackSystem {
       fontStyle: 'bold',
       color: '#263d34',
     });
-    graphics.fillStyle(0xfffcf1).fillRoundedRect(24, 645, 720, 42, 12);
-    graphics.fillStyle(0x27ae60).fillCircle(47, 666, 8);
-    this.scene.add.text(65, 656, 'Grün = Abzweig', {
+    graphics.fillStyle(0xfffcf1).fillRoundedRect(24, 652, 720, 36, 12);
+    graphics.fillStyle(0x27ae60).fillCircle(47, 670, 8);
+    this.scene.add.text(65, 660, 'Grün = Abzweig', {
       fontSize: '18px',
       fontFamily: 'Arial',
       color: '#3e6149',
     });
-    this.scene.add.text(368, 656, '→ Geradeaus    ↗ Gleiswechsel', {
+    this.scene.add.text(368, 660, '→ Geradeaus    ↗ Gleiswechsel', {
       fontSize: '18px',
       fontFamily: 'Arial',
       color: '#3e6149',

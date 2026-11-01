@@ -9,6 +9,7 @@ import {
 } from './config/kiosk.config';
 import type { GameStatus } from './ui/events';
 import './style.css';
+import { BackgroundMusic } from './ui/BackgroundMusic';
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -16,6 +17,15 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
   return found as T;
 }
 
+const musicAssets = import.meta.glob<string>('./assets/*.ogg', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const music = new BackgroundMusic(
+  element<HTMLButtonElement>('music-toggle'),
+  musicAssets['./assets/pixel-hop.ogg'],
+);
 const scene = new MainScene();
 const game = new Phaser.Game({
   type: Phaser.CANVAS,
@@ -77,11 +87,13 @@ function start(): void {
   element('pause').textContent = 'Ⅱ Pause';
   game.scene.stop('MainScene');
   game.scene.start('MainScene');
+  music.startRound();
 }
 
 function home(): void {
   closeDialog();
   game.scene.stop('MainScene');
+  music.stop();
   playing = false;
   paused = false;
   element('menu').hidden = false;
@@ -96,12 +108,14 @@ function resume(): void {
   closeDialog();
   paused = false;
   scene.setPaused(false);
+  music.setPaused(false);
 }
 
 function pause(): void {
   if (!playing || paused) return;
   paused = true;
   scene.setPaused(true);
+  music.setPaused(true);
   element('dialog-kicker').textContent = 'ZEIT ZUM DURCHATMEN';
   showDialog(
     'Deine Bahnen machen Pause.',
@@ -116,11 +130,12 @@ function help(): void {
   if (wasPlaying) {
     paused = true;
     scene.setPaused(true);
+    music.setPaused(true);
   }
   element('dialog-kicker').textContent = 'SO WIRST DU ZUM WEICHENHELDEN';
   showDialog(
-    'Drei Gleise. Du stellst die Weichen.',
-    '<ol class="steps"><li>Zuerst hast du 5 Sekunden zum Umschauen. Deine erste Bahn fährt extra langsam zum Marktplatz.</li><li>Das Schild auf der Bahn zeigt ihr Ziel: D = Durlach, M = Marktplatz, H = Hauptbahnhof. Runde Weichen antippen: Grün bedeutet Abzweig.</li><li>Bahn antippen: einmal 2 Sekunden bremsen. Die Bahn dahinter fährt weiter!</li><li>Richtige Ziele bringen 10–30 Punkte. Drei falsche Ziele oder ein Zusammenstoß beenden die Runde.</li></ol>',
+    'Vier Gleise. Du stellst die Weichen.',
+    '<ol class="steps"><li>Zuerst hast du 5 Sekunden zum Umschauen. Deine erste Bahn fährt extra langsam zum Marktplatz.</li><li>Das Schild auf der Bahn zeigt ihr Ziel: D = Durlach, M = Marktplatz, H = Hauptbahnhof, E = Europaplatz. Runde Weichen antippen: Grün bedeutet Abzweig.</li><li>Bahn antippen: einmal 2 Sekunden bremsen. Die Bahn dahinter fährt weiter!</li><li>Richtige Ziele bringen 10–30 Punkte. Drei falsche Ziele oder ein Zusammenstoß beenden die Runde.</li></ol>',
     wasPlaying ? 'Weiterfahren →' : 'Jetzt spielen →',
     wasPlaying ? resume : start,
   );
@@ -177,6 +192,7 @@ window.addEventListener('kvv:result', (event) => {
     }>
   ).detail;
   playing = false;
+  music.stop();
   element('dialog-kicker').textContent =
     reason === 'complete' ? 'SCHICHT GESCHAFFT!' : 'KURZER BETRIEBSHALT';
   showDialog(

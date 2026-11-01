@@ -1,10 +1,6 @@
 import type { TrackPosition } from '../types';
 
-export const DESTINATIONS = [
-  { track: 'track2', name: 'Durlach', badge: 'D', color: '#286b9b' },
-  { track: 'track3', name: 'Marktplatz', badge: 'M', color: '#8d387e' },
-  { track: 'track4', name: 'Hauptbahnhof', badge: 'H', color: '#966012' },
-] as const;
+export { DESTINATIONS } from '../config/network.config';
 
 export class DispatchRules {
   score = 0;

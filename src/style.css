@@ -442,3 +442,158 @@ h2 {
   color: #bd263b;
   margin-right: 12px;
 }
+
+/* GitHub presentation details adapted to the portrait cabinet. */
+body {
+  background:
+    radial-gradient(ellipse at 15% 20%, #66815c40, transparent 50%),
+    repeating-linear-gradient(135deg, transparent 0 46px, #ffffff03 46px 48px),
+    #243c33;
+}
+#kiosk {
+  box-shadow: 0 24px 100px #101f1b60;
+}
+header {
+  gap: 18px;
+  background: #fffdf8;
+}
+.brand {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.brand-tile {
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 64px;
+  background: #bf263c;
+}
+.brand-tile img {
+  display: block;
+  width: 100px;
+  height: auto;
+}
+.brand-copy {
+  line-height: 1.5;
+}
+.game-name .edition {
+  font-size: 8px;
+  letter-spacing: 1px;
+  margin: 0 0 5px;
+}
+.icon-button {
+  flex: 0 0 64px;
+  background: #f5f4e9;
+  border-radius: 50%;
+}
+.screen {
+  background:
+    radial-gradient(ellipse at 35% 65%, #f4efd9, transparent 65%), #faf8f0;
+}
+h1 em {
+  color: #bf263c;
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: #e9bc49;
+  text-decoration-thickness: 5px;
+  text-underline-offset: 6px;
+}
+.primary {
+  transition: background 0.15s;
+}
+.primary:hover {
+  background: #a91f34;
+}
+.secondary:hover {
+  background: #e3e7d7;
+}
+.hero {
+  box-shadow: 7px 7px 0 #e5e9d6;
+}
+.ticket-stamp {
+  position: absolute;
+  left: 55px;
+  top: 569px;
+  transform: rotate(-5deg);
+  border: 2px dashed #faf8f0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fffdf8;
+  background: #263d34d9;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+.ticket-stamp strong {
+  font-size: 17px;
+  line-height: 1.5;
+}
+.route-strip {
+  font-size: 9px;
+  letter-spacing: 0.3px;
+  font-weight: 700;
+  gap: 6px;
+}
+.route-strip .stop-dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 25px;
+  height: 25px;
+  border: 2px solid #286b9b;
+  border-radius: 50%;
+  color: #286b9b;
+  font-size: 12px;
+  background: #faf8f0;
+}
+.route-strip .stop-dot:nth-of-type(2) {
+  color: #8d387e;
+  border-color: #8d387e;
+}
+.route-strip .stop-dot:nth-of-type(3) {
+  color: #966012;
+  border-color: #966012;
+}
+.route-strip .stop-dot:nth-of-type(4) {
+  color: #287764;
+  border-color: #287764;
+}
+.route-strip b {
+  flex: 1;
+  height: 2px;
+  background: #c3cdb5;
+}
+footer {
+  background: #fffdf8;
+}
+.mascot {
+  border-radius: 50%;
+  border: 2px solid #e8c36e;
+}
+.best strong,
+.stat:first-child strong {
+  color: #bf263c;
+}
+.dialog {
+  border-top: 6px solid #efc65c;
+}
+#music-toggle {
+  position: relative;
+  font-size: 28px;
+}
+#music-toggle[aria-pressed='false']::after {
+  content: '';
+  position: absolute;
+  width: 31px;
+  height: 3px;
+  background: #bf263c;
+  border-radius: 3px;
+  left: 16px;
+  top: 30px;
+  transform: rotate(-45deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}

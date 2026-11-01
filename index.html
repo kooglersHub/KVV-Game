@@ -2,11 +2,12 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#bf263c" />
+    <meta
+      name="description"
+      content="Vier Gleise, eine Mission: Weichen stellen und Bahnen durch Karlsruhe leiten. 90 Sekunden Spielspaß für Touch und Maus."
+    />
     <title>KVV · Weichenheld</title>
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -16,12 +17,28 @@
       <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
       <header>
         <a class="brand" href="#" aria-label="Zur Startseite"
-          ><span class="brand-mark">KVV<span>///</span></span
-          ><span class="brand-copy">Karlsruhe bewegt dich.</span></a
+          ><span class="brand-tile"
+            ><img
+              src="./assets/kvv-logo.svg"
+              width="100"
+              height="49"
+              alt="KVV – Karlsruher Verkehrsverbund" /></span
+          ><span class="brand-copy">Karlsruher<br />Verkehrsverbund</span></a
         >
         <div class="game-name">
+          <span class="edition">DAS KARLSRUHER STELLWERKSPIEL</span>
           WEICHENHELD<span>Dein Netz. Deine Mission.</span>
         </div>
+        <button
+          id="music-toggle"
+          class="icon-button"
+          type="button"
+          aria-label="Musik ausschalten"
+          aria-pressed="true"
+          hidden
+        >
+          ♫
+        </button>
         <button
           id="fullscreen"
           class="icon-button"
@@ -35,7 +52,7 @@
         <div id="menu" class="screen">
           <div class="intro">
             <span class="eyebrow"><i></i> NÄCHSTER HALT: SPIELSPASS</span>
-            <h1>Ganz Karlsruhe.<br />In deiner Hand.</h1>
+            <h1>Ganz Karlsruhe.<br />In <em>deiner</em> Hand.</h1>
             <p>
               Stell die Weichen. Halte die Bahnen in Fahrt.<br />Und werde zum
               Weichenhelden!
@@ -55,9 +72,14 @@
               >Kleine Bahnen.<br />Große Mission.</span
             >
           </div>
-          <div class="route-strip">
-            <span>●</span> DU <b>──────</b> KARLSRUHE <b>──────</b>
-            <span>●</span> DEIN REKORD
+          <div class="route-strip" aria-label="Vier Ziele">
+            <span class="stop-dot">D</span> DURLACH <b></b>
+            <span class="stop-dot">M</span> MARKTPLATZ <b></b>
+            <span class="stop-dot">H</span> HAUPTBAHNHOF <b></b>
+            <span class="stop-dot">E</span> EUROPAPLATZ
+          </div>
+          <div class="ticket-stamp" aria-hidden="true">
+            90 SEKUNDEN<br /><strong>1 MISSION</strong>
           </div>
         </div>
         <div id="overlay" class="overlay" hidden>
@@ -121,7 +143,7 @@
         </div>
         <div class="footer-bottom">
           <span>MIT LIEBE FÜR KARLSRUHE</span
-          ><span>KVV WEICHENHELD · SPIELPROTOTYP</span>
+          ><span>INOFFIZIELLER SPIELPROTOTYP · KVV-LOGO © KVV</span>
         </div>
       </footer>
     </main>

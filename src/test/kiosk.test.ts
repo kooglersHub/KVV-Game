@@ -6,13 +6,19 @@ import {
   ROUND_SECONDS,
   SWITCH_COLUMNS,
 } from '../config/kiosk.config';
+import { ACTIVE_TRACKS, DESTINATIONS } from '../config/network.config';
 import { GAME_CONFIG } from '../config/game.config';
 
 describe('Touch kiosk layout', () => {
+  it('includes four destinations and twelve switches', () => {
+    expect(DESTINATIONS).toHaveLength(4);
+    expect(createKioskLayout().connections).toHaveLength(12);
+  });
+
   it('lets every entry track reach every destination', () => {
     const layout = createKioskLayout();
-    for (const entry of ['track2', 'track3', 'track4']) {
-      let reachable = new Set([entry]);
+    for (const entry of ACTIVE_TRACKS) {
+      let reachable = new Set<string>([entry]);
       for (const column of SWITCH_COLUMNS) {
         const next = new Set(reachable);
         for (const connection of layout.connections.filter(
@@ -22,12 +28,12 @@ describe('Touch kiosk layout', () => {
         }
         reachable = next;
       }
-      expect([...reachable].sort()).toEqual(['track2', 'track3', 'track4']);
+      expect([...reachable].sort()).toEqual([...ACTIVE_TRACKS]);
     }
   });
   it('provides an escape switch on every active track before the stations', () => {
     const layout = createKioskLayout();
-    for (const track of ['track2', 'track3', 'track4']) {
+    for (const track of ACTIVE_TRACKS) {
       const exits = layout.connections.filter(
         (connection) => connection.source === track,
       );
@@ -62,8 +68,8 @@ describe('Touch kiosk layout', () => {
   it('uses a short round and stations beyond the last diversion', () => {
     expect(ROUND_SECONDS).toBe(90);
     for (const station of Object.values(createKioskLayout().stops)) {
-      expect(station.x).toBeGreaterThan(SWITCH_COLUMNS[2] + 80);
-      expect(station.x).toBeLessThan(GAME_CONFIG.width - 90);
+      expect(station.x).toBeGreaterThan(SWITCH_COLUMNS[3] + 80);
+      expect(station.x).toBeLessThan(GAME_CONFIG.width - 36);
       expect(station.duration).toBeLessThanOrEqual(2500);
     }
   });

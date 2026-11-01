@@ -5,10 +5,10 @@ export const GAME_CONFIG = {
 
   physics: {
     tracks: {
-      track1: 70,
-      track2: 226,
-      track3: 394,
-      track4: 562,
+      track1: 210,
+      track2: 340,
+      track3: 470,
+      track4: 600,
       track5: 635,
       track6: 680,
     },
