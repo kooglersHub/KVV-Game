@@ -2,6 +2,10 @@ import type { TrackPosition } from '../types';
 
 export { DESTINATIONS } from '../config/network.config';
 
+export function pointsForStreak(streak: number): number {
+  return 10 * Math.min(5, Math.max(1, streak));
+}
+
 export class DispatchRules {
   score = 0;
   streak = 0;
@@ -16,7 +20,7 @@ export class DispatchRules {
     }
     this.streak++;
     this.delivered++;
-    const points = 10 * Math.min(3, 1 + Math.floor((this.streak - 1) / 3));
+    const points = pointsForStreak(this.streak);
     this.score += points;
     return points;
   }
@@ -27,7 +31,10 @@ export function trafficAt(elapsed: number): {
   speed: number;
   name: string;
 } {
-  if (elapsed < 25) return { interval: 6500, speed: 0.65, name: 'Einfahren' };
-  if (elapsed < 55) return { interval: 4200, speed: 0.8, name: 'Stadtverkehr' };
-  return { interval: 3000, speed: 0.95, name: 'Feierabendverkehr' };
+  // Accelerate gradually, while changing spawn intervals only at phase boundaries.
+  const progress = Math.max(0, Math.min(1, (elapsed - 45) / 45));
+  const speed = 0.65 + progress * 0.15;
+  if (elapsed < 45) return { interval: 6500, speed, name: 'Einfahren' };
+  if (elapsed < 75) return { interval: 5500, speed, name: 'Stadtverkehr' };
+  return { interval: 4800, speed, name: 'Feierabendverkehr' };
 }

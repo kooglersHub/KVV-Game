@@ -54,7 +54,9 @@ describe('Combined destination-aware traffic', () => {
     const point = createKioskLayout().connections.find(
       (item) => item.source === INTRO_TRAIN.track,
     )!;
-    expect((point.x - train.x) / (train.getSpeed() * 0.65)).toBeGreaterThan(5);
+    expect((point.x - train.x) / (train.getSpeed() * 0.65)).toBeGreaterThan(
+      3.5,
+    );
   });
 
   it('keeps introduction spawning paused when traffic phases change', () => {

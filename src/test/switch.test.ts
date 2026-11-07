@@ -61,6 +61,18 @@ describe('Switch Entity', () => {
     expect(switchObj.getState()).toBe('straight');
   });
 
+  it('respects reduced motion when a switch is toggled', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    try {
+      const point = new Switch(mockScene, 200, 100, 'track1', 'track2');
+      point.toggle();
+      expect(point.getState()).toBe('connected');
+      expect(mockScene.tweens.add).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('should toggle between straight and connected states', () => {
     const switchObj = new Switch(mockScene, 200, 100, 'track1', 'track2');
 

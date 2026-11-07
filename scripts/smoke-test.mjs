@@ -36,6 +36,25 @@ try {
     'help fits without scrolling',
   );
   await shot('help');
+  await page.keyboard.press('Shift+Tab');
+  assert.equal(
+    await page
+      .locator('#practice-switch')
+      .evaluate((button) => button === document.activeElement),
+    true,
+  );
+  await page.keyboard.press('Shift+Tab');
+  assert.equal(
+    await page
+      .locator('#dialog-secondary')
+      .evaluate((button) => button === document.activeElement),
+    true,
+  );
+  await page.locator('#practice-switch').tap();
+  assert.equal(
+    await page.locator('#practice-switch').getAttribute('aria-pressed'),
+    'true',
+  );
   await page.locator('#dialog-primary').tap();
   await page.clock.runFor(1100);
   assert.equal(await page.locator('canvas').count(), 1);
@@ -69,7 +88,7 @@ try {
   await page.locator('canvas').tap({ position: { x: 210, y: 210 } });
   await page.clock.runFor(120);
   await shot('game');
-  await page.clock.runFor(21000);
+  await page.clock.runFor(15000);
   assert.ok(
     Number(await page.locator('#score').innerText()) >= 10,
     'first tram can still be routed after three seconds',
@@ -115,6 +134,8 @@ try {
     );
   }
   await page.locator('#start').tap();
+  assert.equal(await page.locator('#overlay').isVisible(), true);
+  await page.locator('#dialog-primary').tap();
   await page.clock.runFor(6000);
   await page.locator('canvas').tap({ position: { x: 210, y: 210 } });
   for (let step = 0; step < 9; step++) {

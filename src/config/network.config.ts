@@ -3,7 +3,7 @@ import { GAME_CONFIG } from './game.config';
 export const ACTIVE_TRACKS = ['track1', 'track2', 'track3', 'track4'] as const;
 export const MAX_TRAINS_PER_DESTINATION = 2;
 export const SPAWN_X = -100;
-export const MAX_PHASE_MULTIPLIER = 0.95;
+export const MAX_PHASE_MULTIPLIER = 0.8;
 export const DESTINATIONS = [
   {
     track: 'track1',
@@ -38,7 +38,7 @@ export const DESTINATIONS = [
 export const INTRO_TRAIN = {
   x: 64,
   track: 'track1',
-  speed: 42,
+  speed: 56,
   destination: 1,
 } as const;
 export const TRAIN_CLEARANCE = GAME_CONFIG.graphics.trainWidth + 48;
