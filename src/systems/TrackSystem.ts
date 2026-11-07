@@ -86,22 +86,16 @@ export class TrackSystem {
     // The signpost terminates on its own rail, so the destination cannot float between lanes.
     graphics
       .lineStyle(3, color, 0.7)
-      .lineBetween(STATION_X, y - 57, STATION_X, y + 10);
-    graphics.fillStyle(0xfffcf1).fillRoundedRect(500, y - 102, 244, 50, 10);
-    graphics.fillStyle(color).fillRoundedRect(500, y - 102, 44, 50, 10);
-    this.scene.add.text(512, y - 90, destination.badge, {
+      .lineBetween(STATION_X, y - 38, STATION_X, y + 10);
+    graphics.fillStyle(0xfffcf1).fillRoundedRect(500, y - 80, 244, 42, 10);
+    graphics.fillStyle(color).fillRoundedRect(500, y - 80, 44, 42, 10);
+    this.scene.add.text(512, y - 74, destination.badge, {
       fontFamily: 'Arial',
       fontSize: '26px',
       fontStyle: 'bold',
       color: '#ffffff',
     });
-    this.scene.add.text(555, y - 97, 'ZIELBAHNHOF', {
-      fontFamily: 'Arial',
-      fontSize: '10px',
-      letterSpacing: 1.4,
-      color: '#53684f',
-    });
-    this.scene.add.text(555, y - 80, destination.name, {
+    this.scene.add.text(555, y - 72, destination.name, {
       fontFamily: 'Arial',
       fontSize: '23px',
       fontStyle: 'bold',
