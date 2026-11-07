@@ -17,7 +17,8 @@ Dies ist ein **inoffizieller Spielprototyp**, kein Angebot des KVV.
 Vier Gleise mit zwölf Weichen und vier Zielen: **D = Durlach, M = Marktplatz,
 H = Hauptbahnhof, E = Europaplatz**. Jedes Ziel ist von jedem Einfahrgleis erreichbar.
 Weichen antippen und die Bahn zum passenden Gleis leiten. Jede richtige Ankunft
-bringt 10 Punkte, ab der vierten richtigen Ankunft in Folge 20, ab der siebten 30.
+bringt 10 Punkte. Jede weitere richtige Ankunft in Folge erhöht den Gewinn:
+**10 → 20 → 30 → 40 → 50 Punkte**, danach weiterhin 50 Punkte pro Bahn.
 Ein falsches Ziel setzt die Serie zurück; drei Fehlleitungen oder ein Zusammenstoß
 beenden die Runde. Eine Bahn lässt sich durch Antippen einmal für zwei Sekunden
 bremsen; sie fährt automatisch weiter. Achtung: Die nachfolgende Bahn fährt weiter!
@@ -25,12 +26,13 @@ bremsen; sie fährt automatisch weiter. Achtung: Die nachfolgende Bahn fährt we
 Vor jeder Runde gibt es **5 Sekunden Orientierung**, ohne die Spielzeit zu verkürzen.
 Weichen lassen sich dabei bereits stellen. Die erste Bahn ist immer sichtbar auf
 dem oberen Gleis, fährt extra langsam und hat das Ziel **M = Marktplatz**. Ab ihrem
-Erscheinen bleiben gut fünf Sekunden bis zur ersten Weiche.
+Erscheinen bleiben etwa vier Sekunden bis zur ersten Weiche.
 Bis zu ihrem ersten Halt fährt diese Einführungsbahn allein; danach beginnt der
 reguläre Verkehr. Der Countdown friert beim Pausieren ebenfalls ein.
 
-Die ersten 25 Spielsekunden sind ruhig, ab Sekunde 25 beginnt der Stadtverkehr und ab
-Sekunde 55 der Feierabendverkehr. Nach 90 Sekunden kommen keine neuen Bahnen mehr;
+Die ersten 45 Spielsekunden sind ruhig. Danach steigt das Tempo gleichmäßig von
+0,65 auf höchstens 0,8 bis zum Rundenende. Neue Bahnen kommen zunächst alle 6,5 Sekunden,
+ab Sekunde 45 alle 5,5 und ab Sekunde 75 alle 4,8 Sekunden. Nach 90 Sekunden kommen keine neuen Bahnen mehr;
 die letzten Bahnen dürfen ihre Ankunft noch abschließen.
 Die Linienbezeichnungen und der Gleisplan sind spielerisch und kein realer Fahrplan.
 
@@ -46,6 +48,10 @@ Die Linienbezeichnungen und der Gleisplan sind spielerisch und kein realer Fahrp
 - Lokaler Rekord; bei gesperrtem Browserspeicher bleibt das Spiel nutzbar.
 - Nach 60 Sekunden ohne Eingabe zurück zum Start. Pause bei verborgenem Browserfenster.
 - Tastatur: Tab/Enter für Menüs, Leertaste/Escape zum Pausieren.
+
+Vor einer neuen Runde erklärt ein kurzer Bildschirm Zielschilder, Weichen/Bremse
+und Kombos. Die Weiche dort lässt sich gefahrlos ausprobieren; „Bahn frei“
+startet die Runde ohne weitere Zwischenschritte. „So geht’s“ öffnet die Erklärung erneut.
 
 ## Lokal starten
 
@@ -167,6 +173,9 @@ Unit-Tests, Build und HTTP-/Asset-Tests aus. Die übernommenen Test-Doubles enth
 - `scripts/prepare-assets.py`: reproduzierbare Bildverkleinerung mit Pillow.
 - `THIRD_PARTY.md`: Herkunft und Lizenzstatus der Basis und Bilder.
 
+Die Designprüfung mit dem Skill `apple-design` ist in
+[docs/design-review.md](docs/design-review.md) dokumentiert.
+
 ## Spätere App
 
 Die Browseranwendung trennt Spiellogik und Oberfläche von der Plattform. Ein
@@ -174,4 +183,4 @@ Web-App-Manifest ist vorhanden. Native Windows-/Android-Pakete, Store-Veröffent
 und Service-Worker-Caching sind noch nicht umgesetzt. Für den Automaten funktioniert
 Offlinebetrieb bereits über den lokalen Server mit allen Dateien auf dem Gerät.
 
-Stand: 1. November 2026. Basis-Commit: `0b8673fd94f2c11e01374c2b19c07e7f70527c06`.
+Stand: 7. November 2026. Basis-Commit: `0b8673fd94f2c11e01374c2b19c07e7f70527c06`.

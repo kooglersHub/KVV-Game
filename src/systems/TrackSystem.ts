@@ -34,25 +34,7 @@ export class TrackSystem {
         backgroundColor: '#d8e6cd',
         padding: { x: 10, y: 4 },
       });
-      graphics.fillStyle(0xfffcf1).fillRoundedRect(520, y - 100, 224, 42, 10);
-      this.scene.add.text(569, y - 88, DESTINATIONS[index].name, {
-        fontFamily: 'Arial',
-        fontSize: '20px',
-        color: DESTINATIONS[index].color,
-      });
-      const color = Phaser.Display.Color.HexStringToColor(
-        DESTINATIONS[index].color,
-      ).color;
-      graphics.fillStyle(color).fillRoundedRect(520, y - 100, 38, 42, 10);
-      this.scene.add.text(531, y - 92, DESTINATIONS[index].badge, {
-        fontSize: '23px',
-        fontFamily: 'Arial',
-        fontStyle: 'bold',
-        color: '#ffffff',
-      });
-      graphics
-        .fillStyle(0xecc768)
-        .fillRoundedRect(STATION_X - 42, y + 24, 68, 9, 4);
+      this.drawStation(graphics, index, y);
     });
     this.connections = this.scene.add.graphics().setDepth(-1);
     this.generatedLayout.connections.forEach(({ x, source, target }) => {
@@ -90,6 +72,53 @@ export class TrackSystem {
       fontFamily: 'Arial',
       color: '#3e6149',
     });
+  }
+
+  private drawStation(
+    graphics: Phaser.GameObjects.Graphics,
+    index: number,
+    y: number,
+  ): void {
+    const destination = DESTINATIONS[index];
+    const color = Phaser.Display.Color.HexStringToColor(
+      destination.color,
+    ).color;
+    // The signpost terminates on its own rail, so the destination cannot float between lanes.
+    graphics
+      .lineStyle(3, color, 0.7)
+      .lineBetween(STATION_X, y - 57, STATION_X, y + 10);
+    graphics.fillStyle(0xfffcf1).fillRoundedRect(500, y - 102, 244, 50, 10);
+    graphics.fillStyle(color).fillRoundedRect(500, y - 102, 44, 50, 10);
+    this.scene.add.text(512, y - 90, destination.badge, {
+      fontFamily: 'Arial',
+      fontSize: '26px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+    });
+    this.scene.add.text(555, y - 97, 'ZIELBAHNHOF', {
+      fontFamily: 'Arial',
+      fontSize: '10px',
+      letterSpacing: 1.4,
+      color: '#53684f',
+    });
+    this.scene.add.text(555, y - 80, destination.name, {
+      fontFamily: 'Arial',
+      fontSize: '23px',
+      fontStyle: 'bold',
+      color: '#263d34',
+    });
+    graphics.fillStyle(color).fillCircle(STATION_X, y, 17);
+    this.scene.add
+      .text(STATION_X, y, destination.badge, {
+        fontFamily: 'Arial',
+        fontSize: '22px',
+        fontStyle: 'bold',
+        color: '#ffffff',
+      })
+      .setOrigin(0.5);
+    graphics
+      .fillStyle(color, 0.55)
+      .fillRoundedRect(STATION_X - 42, y + 24, 68, 9, 4);
   }
 
   private drawConnections(): void {

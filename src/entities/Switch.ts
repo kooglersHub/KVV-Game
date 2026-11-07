@@ -66,14 +66,15 @@ export class Switch extends Phaser.GameObjects.Container {
     this.draw();
 
     // Add toggle animation
-    this.scene.tweens.add({
-      targets: this,
-      scaleX: 1.2,
-      scaleY: 1.2,
-      duration: 100,
-      yoyo: true,
-      ease: 'Quad.easeInOut',
-    });
+    if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: 1.2,
+        scaleY: 1.2,
+        duration: 100,
+        yoyo: true,
+        ease: 'Quad.easeInOut',
+      });
 
     // Emit event for tracking
     this.scene.events.emit('switchToggled');

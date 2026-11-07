@@ -10,6 +10,8 @@ import {
 import type { GameStatus } from './ui/events';
 import './style.css';
 import { BackgroundMusic } from './ui/BackgroundMusic';
+import { mechanicsGuide, enablePracticeSwitch } from './ui/mechanicsGuide';
+import { pointsForStreak } from './systems/DispatchRules';
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
   const found = document.getElementById(id);
@@ -134,14 +136,17 @@ function help(): void {
   }
   element('dialog-kicker').textContent = 'SO WIRST DU ZUM WEICHENHELDEN';
   showDialog(
-    'Vier Gleise. Du stellst die Weichen.',
-    '<ol class="steps"><li>Zuerst hast du 5 Sekunden zum Umschauen. Deine erste Bahn fährt extra langsam zum Marktplatz.</li><li>Das Schild auf der Bahn zeigt ihr Ziel: D = Durlach, M = Marktplatz, H = Hauptbahnhof, E = Europaplatz. Runde Weichen antippen: Grün bedeutet Abzweig.</li><li>Bahn antippen: einmal 2 Sekunden bremsen. Die Bahn dahinter fährt weiter!</li><li>Richtige Ziele bringen 10–30 Punkte. Drei falsche Ziele oder ein Zusammenstoß beenden die Runde.</li></ol>',
-    wasPlaying ? 'Weiterfahren →' : 'Jetzt spielen →',
+    'Drei Handgriffe. Freie Fahrt.',
+    mechanicsGuide(),
+    wasPlaying ? 'Weiterfahren →' : 'Bahn frei →',
     wasPlaying ? resume : start,
+    'Zur Startseite',
+    home,
   );
+  enablePracticeSwitch();
 }
 
-element('start').onclick = start;
+element('start').onclick = help;
 element('help').onclick = help;
 element('game-help').onclick = help;
 element('pause').onclick = pause;
@@ -170,7 +175,7 @@ window.addEventListener('kvv:status', (event) => {
   element('time').textContent =
     `${Math.floor(status.seconds / 60)}:${String(status.seconds % 60).padStart(2, '0')}`;
   element('dispatch-status').textContent = status.phase;
-  element('streak').textContent = String(status.streak);
+  element('streak').textContent = status.streak > 0 ? `${status.streak}×` : '–';
   element('mistakes').textContent = `${status.mistakes}/3`;
   element('round-progress').style.width =
     `${(status.seconds / ROUND_SECONDS) * 100}%`;
@@ -179,7 +184,7 @@ window.addEventListener('kvv:status', (event) => {
   element('game-instruction').textContent =
     status.preparation > 0
       ? 'Du kannst die Weichen schon stellen. Die Zeit läuft noch nicht.'
-      : 'Ziel auf der Bahn beachten · Runde Weichen antippen';
+      : `Nächste richtige Ankunft: +${pointsForStreak(status.streak + 1)} Punkte · Zielschilder abgleichen`;
 });
 window.addEventListener('kvv:result', (event) => {
   const { reason, score, best, delivered, mistakes } = (
@@ -218,8 +223,11 @@ document.addEventListener('keydown', (event) => {
   }
   if (event.code === 'Escape' && playing && element('overlay').hidden) pause();
   if (event.key === 'Tab' && !element('overlay').hidden) {
-    const first = element('dialog-primary');
-    const last = element('dialog-secondary');
+    const buttons = element('overlay').querySelectorAll<HTMLButtonElement>(
+      'button:not([hidden]):not([disabled])',
+    );
+    const first = buttons[0];
+    const last = buttons[buttons.length - 1];
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();

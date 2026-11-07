@@ -69,7 +69,7 @@ export class MainScene extends Phaser.Scene {
           if (!this.clock.preparing) {
             const traffic = trafficAt(0);
             this.trains.updateSpeedMultiplier(traffic.speed);
-            // A visible, predictable first tram gives over five seconds to react.
+            // The short guide and countdown precede a visible, predictable first tram.
             this.trains.startSpawning(traffic.interval, INTRO_TRAIN);
             // Let the learning tram arrive before faster traffic can catch it.
             this.trains.pauseSpawning();
@@ -104,7 +104,8 @@ export class MainScene extends Phaser.Scene {
     this.trains.getTrains().forEach((train) => {
       let art = this.trainArt.get(train);
       if (!art) {
-        train.setFillStyle(0, 0).setStrokeStyle(0);
+        // Physics rectangles stay active for collisions but never appear as artwork.
+        train.setVisible(false);
         art = this.add.image(train.x, train.y, 'kvv-tram').setDepth(5);
         this.assignDestination(train, art);
         this.trainArt.set(train, art);
@@ -124,7 +125,9 @@ export class MainScene extends Phaser.Scene {
         if (this.dispatchCount === 1) this.trains.resumeSpawning();
         const label = this.labels.get(train);
         label?.setText(
-          points ? `+${points} · Angekommen!` : `Ziel war ${target.badge}!`,
+          points
+            ? `+${points} · ${this.rules.streak > 1 ? `${this.rules.streak}er-Kombo!` : 'Angekommen!'}`
+            : `Ziel: ${target.name}`,
         );
         label?.setBackgroundColor(points ? '#326745' : '#b52c40');
         label
@@ -133,7 +136,7 @@ export class MainScene extends Phaser.Scene {
           .setY(train.y + 36);
         this.feedback.setText(
           points
-            ? `+${points} · ${target.name}\n${this.rules.streak} richtige Ankünfte in Folge`
+            ? `+${points} · ${target.name}\n${this.rules.streak > 1 ? `${this.rules.streak}er-Kombo · weiter so!` : 'Richtig! Die nächste Ankunft bringt +20.'}`
             : `Falscher Halt! Ziel: ${target.name}\n${this.rules.mistakes} von 3 Fehlleitungen`,
         );
         this.report();
@@ -158,9 +161,9 @@ export class MainScene extends Phaser.Scene {
       name: target.name,
     });
     const label = this.add
-      .text(train.x, train.y - 39, `${target.badge} · ${target.name}`, {
+      .text(train.x, train.y - 39, `→ ${target.badge} · ${target.name}`, {
         fontFamily: 'Arial',
-        fontSize: '18px',
+        fontSize: '20px',
         fontStyle: 'bold',
         color: '#ffffff',
         backgroundColor: target.color,
