@@ -7,7 +7,7 @@ die tatsächliche Touch-Genauigkeit müssen am Automaten noch geprüft werden.
 Lokaler Browserbetrieb auf Windows und Raspberry Pi OS; keine externen Dienste,
 Schriften, Konten oder Internetverbindung im Spielbetrieb.
 
-**[Im Browser spielen](https://kvv-weichenheld.karl-kugler.workers.dev/)** ·
+**[Im Browser spielen](https://weichenheld.karl-kugler.app/)** ·
 [GitHub-Webdemo](https://kooglershub.github.io/KVV-Game/) ·
 [GitHub-Repository](https://github.com/kooglersHub/KVV-Game)
 
@@ -92,9 +92,10 @@ unter `/KVV-Game/`. Die Pages-Quelle ist **GitHub Actions**.
 ### Cloudflare aktualisieren
 
 Cloudflare Workers Static Assets liefert den Vite-Build aus `dist/` unter
-[kvv-weichenheld.karl-kugler.workers.dev](https://kvv-weichenheld.karl-kugler.workers.dev/)
-aus. Zum Veröffentlichen einer neuen Version im Cloudflare-Konto anmelden, das
-den Worker `kvv-weichenheld` enthält, und aus dem Projektverzeichnis deployen.
+[weichenheld.karl-kugler.app](https://weichenheld.karl-kugler.app/) aus. Die
+benutzerdefinierte Domain ist in `cloudflare.config.ts` hinterlegt. Zum
+Veröffentlichen einer neuen Version im Cloudflare-Konto anmelden, das den
+Worker `kvv-weichenheld` enthält, und aus dem Projektverzeichnis deployen.
 
 ```sh
 pnpm install --frozen-lockfile
