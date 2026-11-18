@@ -94,9 +94,9 @@ test('every possible choice respects destination capacity and speed limits', () 
 });
 
 test('the entry buffer reserves two seconds of braking at the current maximum phase speed', () => {
-  // At 80 base speed, 138 body/margin + 134.4 brake distance needs x >= 172.4.
-  const blocked = [train(2, 80, { track: 'track1', x: 172 })];
+  // At 80 base speed, 138 body/margin + 139.2 brake distance needs x >= 177.2.
+  const blocked = [train(2, 80, { track: 'track1', x: 177 })];
   assert.equal(chooseSpawn(blocked, 'track1'), null);
-  const clear = [train(2, 80, { track: 'track1', x: 173 })];
+  const clear = [train(2, 80, { track: 'track1', x: 178 })];
   assert.equal(chooseSpawn(clear, 'track1', () => 0)?.speed, 80);
 });

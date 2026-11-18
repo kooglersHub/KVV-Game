@@ -27,12 +27,12 @@ describe('Dispatch scoring', () => {
     expect(trafficAt(75).interval).toBe(4800);
     expect(trafficAt(0).speed).toBe(0.68);
     expect(trafficAt(45).speed).toBe(0.68);
-    expect(trafficAt(99).speed).toBeLessThan(0.84);
-    expect(trafficAt(100).speed).toBe(0.84);
-    expect(trafficAt(101).speed).toBe(0.84);
-    for (let second = 1; second <= 100; second++) {
+    expect(trafficAt(75).speed).toBeCloseTo(0.7836, 4);
+    expect(trafficAt(100).speed).toBe(0.87);
+    expect(trafficAt(101).speed).toBe(0.87);
+    for (let second = 46; second <= 100; second++) {
       const increase = trafficAt(second).speed - trafficAt(second - 1).speed;
-      expect(increase).toBeGreaterThanOrEqual(0);
+      expect(increase).toBeGreaterThan(0);
       expect(increase).toBeLessThan(0.004);
     }
   });
