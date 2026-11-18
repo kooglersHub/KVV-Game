@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const gameUrl = process.env.KVV_GAME_URL || 'http://127.0.0.1:3000';
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({
   viewport: { width: 768, height: 1024 },
@@ -24,7 +25,8 @@ try {
     );
   });
   await page.clock.install();
-  await page.goto('http://127.0.0.1:3000');
+  const response = await page.goto(gameUrl);
+  assert.ok(response?.ok(), `Game page failed to load: ${gameUrl}`);
   await page.locator('#start').waitFor();
   await page.clock.runFor(200);
   await shot('menu');
