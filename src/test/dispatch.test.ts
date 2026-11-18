@@ -19,15 +19,17 @@ describe('Dispatch scoring', () => {
     expect(rules.streak).toBe(0);
     expect(rules.arrive('track4', 'track4')).toBe(10);
   });
-  it('keeps the first half quiet and accelerates smoothly afterwards', () => {
+  it('keeps the opening quiet and reaches top speed at 100 seconds', () => {
     expect(trafficAt(0).interval).toBe(6500);
     expect(trafficAt(44).interval).toBe(6500);
     expect(trafficAt(45).interval).toBe(5500);
     expect(trafficAt(74).interval).toBe(5500);
     expect(trafficAt(75).interval).toBe(4800);
-    expect(trafficAt(0).speed).toBe(0.65);
-    expect(trafficAt(44).speed).toBe(0.65);
-    expect(trafficAt(90).speed).toBe(0.8);
+    expect(trafficAt(0).speed).toBe(0.68);
+    expect(trafficAt(45).speed).toBe(0.68);
+    expect(trafficAt(99).speed).toBeLessThan(0.84);
+    expect(trafficAt(100).speed).toBe(0.84);
+    expect(trafficAt(101).speed).toBe(0.84);
     for (let second = 1; second <= 100; second++) {
       const increase = trafficAt(second).speed - trafficAt(second - 1).speed;
       expect(increase).toBeGreaterThanOrEqual(0);

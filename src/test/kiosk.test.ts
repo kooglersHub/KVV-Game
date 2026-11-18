@@ -66,7 +66,7 @@ describe('Touch kiosk layout', () => {
   });
 
   it('uses a short round and stations beyond the last diversion', () => {
-    expect(ROUND_SECONDS).toBe(90);
+    expect(ROUND_SECONDS).toBe(100);
     for (const station of Object.values(createKioskLayout().stops)) {
       expect(station.x).toBeGreaterThan(SWITCH_COLUMNS[3] + 80);
       expect(station.x).toBeLessThan(GAME_CONFIG.width - 36);
