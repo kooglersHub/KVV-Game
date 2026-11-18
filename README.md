@@ -7,7 +7,8 @@ die tatsächliche Touch-Genauigkeit müssen am Automaten noch geprüft werden.
 Lokaler Browserbetrieb auf Windows und Raspberry Pi OS; keine externen Dienste,
 Schriften, Konten oder Internetverbindung im Spielbetrieb.
 
-**[Webdemo](https://kooglershub.github.io/KVV-Game/)** ·
+**[Im Browser spielen](https://kvv-weichenheld.karl-kugler.workers.dev/)** ·
+[GitHub-Webdemo](https://kooglershub.github.io/KVV-Game/) ·
 [GitHub-Repository](https://github.com/kooglersHub/KVV-Game)
 
 Dies ist ein **inoffizieller Spielprototyp**, kein Angebot des KVV.
@@ -88,6 +89,20 @@ und prüft die ausgelieferten Dateien. Nach erfolgreichen Prüfungen auf `main`
 veröffentlicht der Pages-Workflow `dist/`. Relative Assetpfade funktionieren auch
 unter `/KVV-Game/`. Die Pages-Quelle ist **GitHub Actions**.
 
+### Cloudflare aktualisieren
+
+Cloudflare Workers Static Assets liefert den Vite-Build aus `dist/` unter
+[kvv-weichenheld.karl-kugler.workers.dev](https://kvv-weichenheld.karl-kugler.workers.dev/)
+aus. Zum Veröffentlichen einer neuen Version im Cloudflare-Konto anmelden, das
+den Worker `kvv-weichenheld` enthält, und aus dem Projektverzeichnis deployen.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm dlx cf@1.0.0-rc.1 auth login
+pnpm dlx cf@1.0.0-rc.1 deploy ./dist
+```
+
 ### Optionale Musik
 
 Die GitHub-Version verweist auf `pixel-hop.ogg`, enthält diese Datei aber nicht.
@@ -154,8 +169,9 @@ pnpm exec playwright install chromium
 node scripts/smoke-test.mjs
 ```
 
-Alternativ PLAYWRIGHT_MODULE auf einen bereits installierten Playwright-Paketpfad
-setzen. Screenshots entstehen in `test-results/`. GitHub Actions führt Lint,
+Alternativ `PLAYWRIGHT_MODULE` auf einen bereits installierten Playwright-Paketpfad
+setzen. Mit `KVV_GAME_URL` lässt sich der Browsertest gegen die veröffentlichte
+Website ausführen. Screenshots entstehen in `test-results/`. GitHub Actions führt Lint,
 Unit-Tests, Build und HTTP-/Asset-Tests aus. Die übernommenen Test-Doubles enthalten noch explizite
 `any`-Typen, die der Linter als Warnung meldet. Produktivcode ist streng typisiert.
 
