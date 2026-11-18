@@ -54,8 +54,9 @@ test('page and manifest assets work beneath a GitHub Pages project path', async 
   }
 });
 
-test('visitors can zoom the page on smaller displays', async () => {
+test('the browser uses the full screen and allows zooming', async () => {
   const html = await (await fetch(origin)).text();
+  assert.match(html, /viewport-fit=cover/);
   assert.doesNotMatch(html, /maximum-scale|user-scalable=no/);
 });
 
@@ -89,11 +90,11 @@ test('requests cannot read files outside the website directory', async () => {
   assert.equal((await fetch(`${origin}/%2e%2e%2fREADME.md`)).status, 403);
 });
 
-test('the combined build keeps portrait orientation and all four destination markers', async () => {
+test('the installed game allows rotation and includes all four destination markers', async () => {
   const manifest = JSON.parse(
     await readFile('dist/manifest.webmanifest', 'utf8'),
   );
-  assert.equal(manifest.orientation, 'portrait');
+  assert.equal(manifest.orientation, 'any');
   const html = await (await fetch(origin)).text();
   for (const badge of ['D', 'M', 'H', 'E'])
     assert.ok(html.includes(`stop-dot">${badge}</span>`));

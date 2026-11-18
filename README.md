@@ -2,7 +2,7 @@
 
 Spielbarer Touchscreen-Prototyp auf Basis von [mojzis/traingame](https://github.com/mojzis/traingame).
 Ziel: der auf den drei Gerätefotos gezeigte Fahrkartenautomat mit Hochkant-Touchscreen.
-Die Oberfläche ist auf **768 × 1024 Pixel (3:4)** ausgelegt. Die native Auflösung und
+Die Automatenansicht ist auf **768 × 1024 Pixel (3:4)** ausgelegt. Die native Auflösung und
 die tatsächliche Touch-Genauigkeit müssen am Automaten noch geprüft werden.
 Lokaler Browserbetrieb auf Windows und Raspberry Pi OS; keine externen Dienste,
 Schriften, Konten oder Internetverbindung im Spielbetrieb.
@@ -145,13 +145,12 @@ Garantie. Vor dem Automatenbetrieb prüfen:
 3. Mehrere vollständige Runden, Kollision, Pause, Neustart und Inaktivitätsrückkehr.
 4. Kaltstart ohne Netz, Vollbild, Wiederanlauf nach Stromverlust.
 
-Die Oberfläche skaliert proportional und behält ihr 3:4-Hochkantformat. Andere
-Seitenverhältnisse erhalten Außenränder. Eine Drehung des Betriebssystems muss auch
-auf die Touch-Eingaben angewendet werden. Kleinere Displays verkleinern die
-Touchflächen; die Abnahme erfolgt deshalb auf dem realen Automaten.
-
-Automatisiert im Chromium-Browser geprüft: 768 × 1024, 600 × 800, 1080 × 1920 und
-1024 × 768. Diese Prüfung ersetzt keinen Test der tatsächlichen Automatenhardware.
+Im Browser bleibt das Spiel in der verfügbaren Fläche zentriert. In breiten
+Fenstern wandern Punkteanzeige und Bedienelemente neben das Spielfeld, sodass
+mehr Platz für die Weichen bleibt. Auf Mobilgeräten berücksichtigt die Ansicht
+die Browserleisten und die Sicherheitsabstände am Bildschirmrand. Kleinere
+Displays verkleinern die Touchflächen. Am Automaten müssen Bildschirmrotation
+und Touch-Eingaben gemeinsam auf der tatsächlichen Hardware geprüft werden.
 
 ## Qualität prüfen
 
@@ -166,13 +165,16 @@ Browserprüfung bei laufendem Produktionsserver:
 
 ```sh
 pnpm add -D playwright
-pnpm exec playwright install chromium
+pnpm exec playwright install chromium firefox webkit
 node scripts/smoke-test.mjs
 ```
 
 Alternativ `PLAYWRIGHT_MODULE` auf einen bereits installierten Playwright-Paketpfad
 setzen. Mit `KVV_GAME_URL` lässt sich der Browsertest gegen die veröffentlichte
-Website ausführen. Screenshots entstehen in `test-results/`. GitHub Actions führt Lint,
+Website ausführen. `KVV_BROWSER=webkit` oder `KVV_BROWSER=firefox` wählt eine
+andere Browser-Engine. Der Test prüft Zentrierung bei zehn Fenstergrößen,
+Sicherheitsabstände und Touch-Eingabe nach dem Drehen. Screenshots entstehen in
+`test-results/`. GitHub Actions führt Lint,
 Unit-Tests, Build und HTTP-/Asset-Tests aus. Die übernommenen Test-Doubles enthalten noch explizite
 `any`-Typen, die der Linter als Warnung meldet. Produktivcode ist streng typisiert.
 

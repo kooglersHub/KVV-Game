@@ -1,9 +1,14 @@
 import type { GeneratedLayout } from '../types/layout';
+import { GAME_CONFIG } from './game.config';
 import { ACTIVE_TRACKS, DESTINATIONS } from './network.config';
 
 export const ROUND_SECONDS = 90;
 export const PREPARATION_SECONDS = 5;
 export const KIOSK_DISPLAY = { width: 768, height: 1024 } as const;
+export const LANDSCAPE_DISPLAY = {
+  width: GAME_CONFIG.width + 352,
+  height: GAME_CONFIG.height,
+} as const;
 export const SWITCH_COLUMNS = [210, 340, 470, 600] as const;
 export const STATION_X = 720;
 export const ARRIVAL_X = STATION_X - 30;

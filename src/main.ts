@@ -5,6 +5,7 @@ import { StorageManager } from './systems/StorageManager';
 import {
   KIOSK_DISPLAY,
   KIOSK_IDLE_SECONDS,
+  LANDSCAPE_DISPLAY,
   ROUND_SECONDS,
 } from './config/kiosk.config';
 import type { GameStatus } from './ui/events';
@@ -157,7 +158,9 @@ document.querySelector<HTMLAnchorElement>('.brand')!.onclick = (event) => {
   if (playing) pause();
   else home();
 };
-element('fullscreen').onclick = async () => {
+const fullscreenButton = element<HTMLButtonElement>('fullscreen');
+fullscreenButton.hidden = !document.fullscreenEnabled;
+fullscreenButton.onclick = async () => {
   try {
     if (document.fullscreenElement) await document.exitFullscreen();
     else await document.documentElement.requestFullscreen();
@@ -247,13 +250,49 @@ setInterval(() => {
   )
     home();
 }, 1000);
-function resize(): void {
-  const scale = Math.min(
-    window.innerWidth / KIOSK_DISPLAY.width,
-    window.innerHeight / KIOSK_DISPLAY.height,
+const viewport = element('game-viewport');
+const kiosk = element('kiosk');
+const hasDynamicViewport = window.CSS.supports('height', '100dvh');
+const ViewportObserver = window.ResizeObserver;
+
+function fitGame(): void {
+  const visualViewport = window.visualViewport;
+  if (!hasDynamicViewport && (!visualViewport || visualViewport.scale === 1)) {
+    document.body.style.height = `${visualViewport?.height ?? window.innerHeight}px`;
+  }
+
+  const { width, height } = viewport.getBoundingClientRect();
+  if (!width || !height) return;
+
+  const portraitScale = Math.min(
+    width / KIOSK_DISPLAY.width,
+    height / KIOSK_DISPLAY.height,
   );
-  element('kiosk').style.transform = `scale(${scale})`;
+  const landscapeScale = Math.min(
+    width / LANDSCAPE_DISPLAY.width,
+    height / LANDSCAPE_DISPLAY.height,
+  );
+  const landscape = landscapeScale > portraitScale;
+  const display = landscape ? LANDSCAPE_DISPLAY : KIOSK_DISPLAY;
+  kiosk.classList.toggle('landscape', landscape);
+  kiosk.style.setProperty('--game-width', `${display.width}px`);
+  kiosk.style.setProperty('--game-height', `${display.height}px`);
+  kiosk.style.setProperty(
+    '--game-scale',
+    String(Math.max(portraitScale, landscapeScale)),
+  );
+
+  // Phaser uses the rendered canvas bounds to translate screen taps to the track grid.
+  if (game.canvas) game.scale.refresh();
 }
-window.addEventListener('resize', resize);
-resize();
+
+if (ViewportObserver) {
+  new ViewportObserver(fitGame).observe(viewport);
+}
+if (!hasDynamicViewport || !ViewportObserver) {
+  window.addEventListener('resize', fitGame);
+}
+if (!hasDynamicViewport)
+  window.visualViewport?.addEventListener('resize', fitGame);
+fitGame();
 updateBest();
