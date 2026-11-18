@@ -3,7 +3,7 @@ import { GAME_CONFIG } from './game.config';
 export const ACTIVE_TRACKS = ['track1', 'track2', 'track3', 'track4'] as const;
 export const MAX_TRAINS_PER_DESTINATION = 2;
 export const SPAWN_X = -100;
-export const MAX_PHASE_MULTIPLIER = 0.84;
+export const MAX_PHASE_MULTIPLIER = 0.87;
 export const DESTINATIONS = [
   {
     track: 'track1',

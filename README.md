@@ -32,7 +32,7 @@ Bis zu ihrem ersten Halt fährt diese Einführungsbahn allein; danach beginnt de
 reguläre Verkehr. Der Countdown friert beim Pausieren ebenfalls ein.
 
 Die ersten 45 Spielsekunden sind ruhig. Danach steigt das Tempo gleichmäßig von
-0,68 auf höchstens 0,84 bis zum Rundenende. Neue Bahnen kommen zunächst alle
+0,68 auf höchstens 0,87 bis zum Rundenende. Neue Bahnen kommen zunächst alle
 6,5 Sekunden, ab Sekunde 45 alle 5,5 und ab Sekunde 75 alle 4,8 Sekunden. Nach
 100 Sekunden kommen keine neuen Bahnen mehr. Die letzten Bahnen dürfen noch ankommen.
 Die Linienbezeichnungen und der Gleisplan sind spielerisch und kein realer Fahrplan.
