@@ -1,6 +1,11 @@
 import type { TrackPosition } from '../types';
+import { ROUND_SECONDS } from '../config/kiosk.config';
+import { MAX_PHASE_MULTIPLIER } from '../config/network.config';
 
 export { DESTINATIONS } from '../config/network.config';
+
+const ACCELERATION_START_SECOND = 45;
+const START_PHASE_MULTIPLIER = 0.68;
 
 export function pointsForStreak(streak: number): number {
   return 10 * Math.min(5, Math.max(1, streak));
@@ -32,9 +37,19 @@ export function trafficAt(elapsed: number): {
   name: string;
 } {
   // Accelerate gradually, while changing spawn intervals only at phase boundaries.
-  const progress = Math.max(0, Math.min(1, (elapsed - 45) / 45));
-  const speed = 0.65 + progress * 0.15;
-  if (elapsed < 45) return { interval: 6500, speed, name: 'Einfahren' };
+  const progress = Math.max(
+    0,
+    Math.min(
+      1,
+      (elapsed - ACCELERATION_START_SECOND) /
+        (ROUND_SECONDS - ACCELERATION_START_SECOND),
+    ),
+  );
+  const speed =
+    START_PHASE_MULTIPLIER +
+    progress * (MAX_PHASE_MULTIPLIER - START_PHASE_MULTIPLIER);
+  if (elapsed < ACCELERATION_START_SECOND)
+    return { interval: 6500, speed, name: 'Einfahren' };
   if (elapsed < 75) return { interval: 5500, speed, name: 'Stadtverkehr' };
   return { interval: 4800, speed, name: 'Feierabendverkehr' };
 }

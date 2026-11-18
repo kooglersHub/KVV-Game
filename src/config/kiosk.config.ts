@@ -2,7 +2,7 @@ import type { GeneratedLayout } from '../types/layout';
 import { GAME_CONFIG } from './game.config';
 import { ACTIVE_TRACKS, DESTINATIONS } from './network.config';
 
-export const ROUND_SECONDS = 90;
+export const ROUND_SECONDS = 100;
 export const PREPARATION_SECONDS = 5;
 export const KIOSK_DISPLAY = { width: 768, height: 1024 } as const;
 export const LANDSCAPE_DISPLAY = {

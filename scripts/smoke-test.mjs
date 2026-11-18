@@ -85,10 +85,12 @@ try {
   const response = await page.goto(gameUrl);
   assert.ok(response?.ok(), `Game page failed to load: ${gameUrl}`);
   await page.locator('#start').waitFor();
+  assert.match(await page.locator('.intro-meta').innerText(), /100 Sekunden/);
   await page.clock.runFor(200);
   await checkLayout(false);
   await shot('menu');
   await page.locator('#help').tap();
+  assert.match(await page.locator('.guide-note').innerText(), /100 Sekunden/);
   assert.ok(
     await page
       .locator('.dialog')
@@ -118,7 +120,7 @@ try {
   await page.locator('#dialog-primary').tap();
   await page.clock.runFor(1100);
   assert.equal(await page.locator('canvas').count(), 1);
-  assert.equal(await page.locator('#time').innerText(), '1:30');
+  assert.equal(await page.locator('#time').innerText(), '1:40');
   assert.equal(
     await page.evaluate(() => window.dispatches.length),
     0,
@@ -201,7 +203,7 @@ try {
   await page.locator('#dialog-primary').tap();
   await page.clock.runFor(1000);
   assert.equal(await page.locator('#overlay').isVisible(), false);
-  assert.equal(await page.locator('#time').innerText(), '1:30');
+  assert.equal(await page.locator('#time').innerText(), '1:40');
   assert.match(
     await page.locator('#dispatch-status').innerText(),
     /Abfahrt in/,

@@ -4,6 +4,7 @@ import { TrainManager } from '../systems/TrainManager';
 import { Train } from '../entities/Train';
 import { INTRO_TRAIN, DESTINATIONS } from '../config/network.config';
 import { createKioskLayout } from '../config/kiosk.config';
+import { trafficAt } from '../systems/DispatchRules';
 
 function createManager() {
   const timers: {
@@ -45,8 +46,9 @@ beforeEach(() => Train.setGeneratedStops({}));
 describe('Combined destination-aware traffic', () => {
   it('reserves a visible slow introduction before rendering', () => {
     const { manager } = createManager();
-    manager.updateSpeedMultiplier(0.65);
-    manager.startSpawning(6500, INTRO_TRAIN);
+    const { speed, interval } = trafficAt(0);
+    manager.updateSpeedMultiplier(speed);
+    manager.startSpawning(interval, INTRO_TRAIN);
     const [train] = manager.getTrains();
     expect(train.x).toBe(INTRO_TRAIN.x);
     expect(train.getCurrentTrack()).toBe(INTRO_TRAIN.track);
@@ -54,7 +56,7 @@ describe('Combined destination-aware traffic', () => {
     const point = createKioskLayout().connections.find(
       (item) => item.source === INTRO_TRAIN.track,
     )!;
-    expect((point.x - train.x) / (train.getSpeed() * 0.65)).toBeGreaterThan(
+    expect((point.x - train.x) / (train.getSpeed() * speed)).toBeGreaterThan(
       3.5,
     );
   });

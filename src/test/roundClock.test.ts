@@ -8,20 +8,23 @@ describe('Preparation and shift timing', () => {
       expect(clock.preparing).toBe(true);
       expect(clock.preparation).toBe(second);
       clock.tick();
-      expect(clock.remaining).toBe(90);
+      expect(clock.remaining).toBe(100);
       expect(clock.elapsed).toBe(0);
     }
     expect(clock.preparing).toBe(false);
     clock.tick();
-    expect(clock.remaining).toBe(89);
+    expect(clock.remaining).toBe(99);
     expect(clock.elapsed).toBe(1);
   });
 
   it('ends the shift at zero and never produces negative time', () => {
     const clock = new RoundClock();
-    for (let second = 0; second < 120; second++) clock.tick();
+    for (let second = 0; second < 104; second++) clock.tick();
+    expect(clock.remaining).toBe(1);
+    clock.tick();
+    clock.tick();
     expect(clock.remaining).toBe(0);
-    expect(clock.elapsed).toBe(90);
+    expect(clock.elapsed).toBe(100);
     expect(clock.preparation).toBe(0);
   });
 });
